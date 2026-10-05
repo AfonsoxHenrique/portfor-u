@@ -46,11 +46,18 @@ const Login = () => {
         try {
             setLoading(true);
 
-            await signInWithEmailAndPassword(
+            const userCredential = await signInWithEmailAndPassword(
                 auth,
                 email.trim(),
                 password
             );
+
+            const user = userCredential.user;
+
+            if (!user.emailVerified) {
+                router.replace("/verify-email");
+                return;
+            }
 
             router.replace("/home");
         } catch (error) {

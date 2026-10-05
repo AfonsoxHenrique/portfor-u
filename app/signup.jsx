@@ -12,7 +12,10 @@ import { useRouter } from "expo-router";
 import { colors, spacing, radius } from "../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 
@@ -60,10 +63,12 @@ const SignUp = () => {
                 email.trim(),
                 password
             );
-
             const user = userCredential.user;
 
-            // Save additional user information in Firestore
+            //Sends verification email
+            await sendEmailVerification(user);
+
+            //Saves user
             await setDoc(doc(db, "users", user.uid), {
                 userId: user.uid,
                 firstName: firstName.trim(),
@@ -73,8 +78,8 @@ const SignUp = () => {
                 createdAt: new Date(),
             });
 
-            // Go to Home after successful registration
-            router.replace("/home");
+            // Go to email verification page
+            router.replace("/verify-email");
 
         } catch (error) {
             console.log("Sign up error:", error);
