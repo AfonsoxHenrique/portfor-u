@@ -1,7 +1,7 @@
 import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { colors } from "../theme/colors";
 import { BottomTabBar } from "../components/BottomTabBar";
 
 /*palette={
@@ -60,7 +60,6 @@ const sections=[
 ];
 
 export default function Guidelines() {
-    const router = useRouter();
     return(
         <SafeAreaView style={{flex:1,backgroundColor:"#F7F9FC"}} edges={["top"]}>
             <View style={{flex:1}}>
