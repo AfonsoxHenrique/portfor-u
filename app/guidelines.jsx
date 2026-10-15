@@ -119,7 +119,7 @@ export default function Guidelines() {
                     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
                         {["UI/UX", "Figma", "React"].map((skill) => (
                             <View key={skill} style={{ backgroundColor: "#EFF6FF", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 }}>
-                             <Text style={{ color: palette.blue, fontSize: 10, fontWeight: "700" }}>{skill}</Text>
+                             <Text style={{ color:"#3B82F6", fontSize: 10, fontWeight: "700" }}>{skill}</Text>
                             </View>
                         ))}
                     </View>
