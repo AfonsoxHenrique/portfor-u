@@ -3,11 +3,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { colors, spacing } from "../theme/colors";
 
-
+// Visual stand-in for the mockup's bottom bar. If you move to an
+// expo-router (tabs) group instead, delete this and let the Tabs layout
+// render the bar for you.
 const TABS = [
     { key: 'home', label: 'Home', icon: 'home', route: '/home' },
-    { key: 'resume', label: 'Resume', icon: 'document-text-outline', route: '/resume' },
-    { key: 'guidelines', label: 'Guidelines', icon: 'list-outline', route: '/guidelines' },
+    { key: 'resumes', label: 'Resume', icon: 'document-text-outline', route: '/resume' },
+    { key: 'guideline', label: 'Guideline', icon: 'locate-outline', route: '/guideline' },
     { key: 'profile', label: 'Profile', icon: 'person-outline', route: '/profile' },
 ]
 

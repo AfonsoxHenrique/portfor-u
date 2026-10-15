@@ -10,17 +10,14 @@ const Welcome = () => {
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
-                <View style={styles.brandBlock}>
-                    <Text style={styles.brand}>PORTFOR-U</Text>
-                    <Text style={styles.tagline}>SUCCEED <Text style={styles.taglineDot}>•</Text> POST-GRAD</Text>
-                </View>
-
-                
-
+                <Image 
+                    style={styles.illustration} 
+                    source={require('../assets/Portfor-3.png')}
+                />
                 <Text style={styles.headline}>Your Professional Launchpad</Text>
                 <Text style={styles.description}>
-                    Organize your resume, log your project experience, showcase certificates,
-                    and manage your applications all in one space.
+                    Organize your resume, log your project experience, showcase certificates and badges,
+                    and learn from the guidelines.
                 </Text>
 
                 <View style={styles.actions}>
@@ -56,30 +53,10 @@ const styles = StyleSheet.create({
         paddingTop: spacing.lg,
         justifyContent: "space-between",
     },
-    brandBlock: {
-        alignItems: "center",
-        marginTop: spacing.md,
-    },
-    brand: {
-        fontSize: 22,
-        fontWeight: "800",
-        color: colors.navy,
-        letterSpacing: 1,
-    },
-    tagline: {
-        fontSize: 12,
-        fontWeight: "700",
-        color: colors.accentBlue,
-        letterSpacing: 2,
-        marginTop: spacing.xs,
-    },
-    taglineDot: {
-        color: colors.textMuted,
-    },
     illustration: {
         width: "100%",
-        height: 220,
-        marginTop: spacing.lg,
+        height: 240,
+        marginTop: 36,
     },
     headline: {
         fontSize: 22,
