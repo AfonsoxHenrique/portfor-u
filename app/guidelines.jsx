@@ -899,7 +899,7 @@ export default function Guidelines() {
                         ))}
                     </View>
 
-                    {/* Footer */}
+                    {/* Footer Note */}
                     <View
                         style={{
                             flexDirection: "row",
