@@ -236,10 +236,7 @@ export default function Guidelines() {
                                     lineHeight: 19,
                                 }}
                             >
-                                A strong resume clearly presents your skills,
-                                experience and achievements. Keep it relevant
-                                to the job and follow Local application
-                                conventions.
+                                Keep it relevant to the job and follow Local application conventions.
                             </Text>
                         </View>
                     </View>
