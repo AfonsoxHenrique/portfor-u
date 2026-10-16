@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-    Alert,
-    Linking,
-    ScrollView,
-    Text,
-    View,
-    TouchableOpacity,
-} from "react-native";
+import {Alert, Linking, ScrollView, Text, View, TouchableOpacity,} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -91,7 +84,7 @@ export default function Guidelines() {
     };
 
     const progress = checkedItems.length / checklist.length;
-
+{/* pop up */}
     const openResource = async (url) => {
         try {
             await Linking.openURL(url);
@@ -114,27 +107,23 @@ export default function Guidelines() {
         <SafeAreaView
             style={{
                 flex: 1,
-                backgroundColor: "#F7F9FC",
-            }}
+                backgroundColor: "#F7F9FC",}}
             edges={["top"]}
         >
             <View style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={{
-                        paddingBottom: spacing.lg,
-                    }}
-                    showsVerticalScrollIndicator={false}
-                >
+                        paddingBottom: spacing.lg,}}
+                    showsVerticalScrollIndicator={false}>
+                    
                     {/* Header */}
-                    <View
-                        style={{
+                    <View style={{
                             backgroundColor: "#FDF2F8",
                             paddingHorizontal: 20,
                             paddingTop: 16,
                             paddingBottom: 20,
                             flexDirection: "row",
-                            alignItems: "center",
-                        }}
+                            alignItems: "center",}}
                     >
                         <TouchableOpacity
                             onPress={() => router.back()}
@@ -149,44 +138,33 @@ export default function Guidelines() {
                                 justifyContent: "center",
                                 marginRight: 14,
                                 borderWidth: 1,
-                                borderColor: "#E5EAF2",
-                            }}
+                                borderColor: "#E5EAF2",}}
                         >
                             <Ionicons
                                 name="chevron-back-outline"
                                 size={20}
-                                color="#1F2937"
-                            />
+                                color="#1F2937"/>
                         </TouchableOpacity>
 
                         <View style={{ flex: 1 }}>
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1F2937",
                                     fontSize: 20,
-                                    fontWeight: "800",
-                                }}
-                            >
-                                Resume Guideline
-                            </Text>
+                                    fontWeight: "800",}}
+                            > Resume Guideline </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#EF4444",
                                     fontSize: 10,
                                     fontWeight: "800",
                                     letterSpacing: 0.8,
-                                    marginTop: 3,
-                                }}
-                            >
-                                HOW TO WRITE A STRONG RESUME
-                            </Text>
+                                    marginTop: 3,}}
+                            > HOW TO WRITE A STRONG RESUME </Text>
                         </View>
                     </View>
 
                     {/* Introduction */}
-                    <View
-                        style={{
+                    <View style={{
                             marginHorizontal: 20,
                             marginTop: 18,
                             marginBottom: 20,
@@ -196,19 +174,16 @@ export default function Guidelines() {
                             backgroundColor: "#FFFFFF",
                             borderWidth: 1,
                             borderColor: "#E5EAF2",
-                            borderRadius: 16,
-                        }}
+                            borderRadius: 16,}}
                     >
-                        <View
-                            style={{
+                        <View style={{
                                 width: 40,
                                 height: 40,
                                 borderRadius: 12,
                                 backgroundColor: "#FDF2F8",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                marginRight: 12,
-                            }}
+                                marginRight: 12,}}
                         >
                             <Ionicons
                                 name="bulb-outline"
@@ -218,68 +193,47 @@ export default function Guidelines() {
                         </View>
 
                         <View style={{ flex: 1 }}>
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1F2937",
                                     fontSize: 14,
                                     fontWeight: "800",
-                                    marginBottom: 5,
-                                }}
-                            >
-                                What Makes a Good Resume?
-                            </Text>
+                                    marginBottom: 5,}}
+                            > What Makes a Good Resume? </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#64748B",
                                     fontSize: 12,
-                                    lineHeight: 19,
-                                }}
-                            >
-                                Keep it relevant to the job and follow Local application conventions.
-                            </Text>
+                                    lineHeight: 19,}}
+                            > Keep it relevant to the job and follow Local application conventions. </Text>
                         </View>
                     </View>
 
                     {/* Resume Tips */}
-                    <View
-                        style={{
+                    <View style={{
                             paddingHorizontal: 20,
-                            marginBottom: 10,
-                        }}
+                            marginBottom: 10,}}
                     >
-                        <View
-                            style={{
+                        <View style={{
                                 flexDirection: "row",
                                 alignItems: "center",
                                 justifyContent: "space-between",
-                                marginBottom: 14,
-                            }}
+                                marginBottom: 14,}}
                         >
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1F2937",
                                     fontSize: 18,
-                                    fontWeight: "800",
-                                }}
-                            >
-                                Resume Tips
-                            </Text>
+                                    fontWeight: "800",}}
+                            > Resume Tips </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#3B82F6",
                                     fontSize: 10,
-                                    fontWeight: "800",
-                                }}
-                            >
-                                5 TIPS
-                            </Text>
+                                    fontWeight: "800",}}
+                            > 5 TIPS </Text>
                         </View>
 
                         {sections.map((section) => (
-                            <View
-                                key={section.number}
+                            <View key={section.number}
                                 style={{
                                     flexDirection: "row",
                                     alignItems: "flex-start",
@@ -288,19 +242,16 @@ export default function Guidelines() {
                                     borderWidth: 1,
                                     borderColor: "#E5EAF2",
                                     padding: 14,
-                                    marginBottom: 12,
-                                }}
+                                    marginBottom: 12,}}
                             >
-                                <View
-                                    style={{
+                                <View style={{
                                         width: 40,
                                         height: 40,
                                         borderRadius: 12,
                                         backgroundColor: "#FDF2F8",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        marginRight: 12,
-                                    }}
+                                        marginRight: 12, }}
                                 >
                                     <Ionicons
                                         name={section.icon}
@@ -310,26 +261,21 @@ export default function Guidelines() {
                                 </View>
 
                                 <View style={{ flex: 1 }}>
-                                    <View
-                                        style={{
+                                    <View style={{
                                             flexDirection: "row",
                                             alignItems: "center",
-                                            marginBottom: 5,
-                                        }}
+                                            marginBottom: 5, }}
                                     >
-                                        <Text
-                                            style={{
+                                        <Text style={{
                                                 color: "#3B82F6",
                                                 fontSize: 11,
                                                 fontWeight: "800",
-                                                marginRight: 8,
-                                            }}
+                                                marginRight: 8, }}
                                         >
                                             {section.number}
                                         </Text>
 
-                                        <Text
-                                            style={{
+                                        <Text style={{
                                                 flex: 1,
                                                 color: "#1F2937",
                                                 fontSize: 14,
@@ -340,12 +286,10 @@ export default function Guidelines() {
                                         </Text>
                                     </View>
 
-                                    <Text
-                                        style={{
+                                    <Text style={{
                                             color: "#64748B",
                                             fontSize: 12,
-                                            lineHeight: 19,
-                                        }}
+                                            lineHeight: 19,}}
                                     >
                                         {section.body}
                                     </Text>
@@ -354,26 +298,18 @@ export default function Guidelines() {
                         ))}
                     </View>
 
-                    {/* Resume Template Example */}
-                    <View
-                        style={{
-                            paddingHorizontal: 20,
-                            paddingTop: 10,
-                        }}
+                    {/* Resume Template */}
+                    <View style={{
+                            paddingHorizontal: 20, }}
                     >
-                        <Text
-                            style={{
+                        <Text style={{
                                 color: "#1F2937",
                                 fontSize: 18,
                                 fontWeight: "800",
-                                marginBottom: 6,
-                            }}
-                        >
-                            Resume Template Example
-                        </Text>
+                                marginBottom: 6, }}
+                        >  Resume Template Example </Text>
 
-                        <View
-                            style={{
+                        <View style={{
                                 backgroundColor: "#FFFFFF",
                                 borderRadius: 20,
                                 borderWidth: 1,
@@ -389,71 +325,51 @@ export default function Guidelines() {
                                 elevation: 2,
                             }}
                         >
-                            <View
-                                style={{
+                            <View style={{
                                     alignItems: "center",
-                                    marginBottom: 16,
-                                }}
+                                    marginBottom: 16, }}
                             >
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#1F2937",
                                         fontSize: 18,
-                                        fontWeight: "800",
-                                    }}
-                                >
-                                    Wendy Girl
+                                        fontWeight: "800", }}
+                                > Wendy Girl 
                                 </Text>
 
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#3B82F6",
                                         fontSize: 10,
                                         fontWeight: "700",
                                         letterSpacing: 0.5,
-                                        marginTop: 4,
-                                    }}
-                                >
-                                    DESIGNER · MELBOURNE
+                                        marginTop: 4, }}
+                                > DESIGNER · MELBOURNE
                                 </Text>
 
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#64748B",
                                         fontSize: 10,
-                                        marginTop: 5,
-                                    }}
-                                >
-                                    wendy@example.com
+                                        marginTop: 5, }}
+                                > wendy@example.com
                                 </Text>
                             </View>
 
-                            <View
-                                style={{
+                            <View style={{
                                     height: 1,
                                     backgroundColor: "#E5EAF2",
-                                    marginBottom: 16,
-                                }}
+                                    marginBottom: 16, }}
                             />
-
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1E3A8A",
                                     fontSize: 11,
                                     fontWeight: "800",
-                                    marginBottom: 8,
-                                }}
-                            >
-                                SUMMARY
-                            </Text>
+                                    marginBottom: 8, }}
+                            > SUMMARY </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#64748B",
                                     fontSize: 11,
                                     lineHeight: 17,
-                                    marginBottom: 16,
-                                }}
+                                    marginBottom: 16, }}
                             >
                                 A motivated graduate with experience in
                                 design projects, teamwork and problem-solving.
@@ -461,150 +377,106 @@ export default function Guidelines() {
                                 digital experiences.
                             </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1E3A8A",
                                     fontSize: 11,
                                     fontWeight: "800",
-                                    marginBottom: 8,
-                                }}
-                            >
-                                EXPERIENCE
-                            </Text>
+                                    marginBottom: 8, }}
+                            > EXPERIENCE </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1F2937",
                                     fontSize: 12,
                                     fontWeight: "700",
-                                    marginBottom: 4,
-                                }}
-                            >
-                                Student Project Designer
-                            </Text>
+                                    marginBottom: 4, }}
+                            > Student Project Designer </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#64748B",
                                     fontSize: 10,
-                                    marginBottom: 8,
-                                }}
-                            >
-                                University Project · 2026
-                            </Text>
+                                    marginBottom: 8, }}
+                            > University Project · 2026 </Text>
 
-                            <View
-                                style={{
+                            <View style={{
                                     flexDirection: "row",
                                     alignItems: "flex-start",
-                                    marginBottom: 6,
-                                }}
+                                    marginBottom: 6, }}
                             >
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#64748B",
                                         marginRight: 6,
-                                        fontSize: 11,
-                                    }}
-                                >
-                                    •
-                                </Text>
-                                <Text
-                                    style={{
+                                        fontSize: 11, }}
+                                >    •  </Text>
+                                <Text style={{
                                         flex: 1,
                                         color: "#64748B",
                                         fontSize: 11,
-                                        lineHeight: 16,
-                                    }}
+                                        lineHeight: 16, }}
                                 >
-                                    Collaborated with teammates to plan and
-                                    design a mobile application.
+                                    Collaborated with teammates to plan and design a mobile application.
                                 </Text>
                             </View>
 
-                            <View
-                                style={{
+                            <View style={{
                                     flexDirection: "row",
                                     alignItems: "flex-start",
-                                    marginBottom: 16,
-                                }}
+                                    marginBottom: 16, }}
                             >
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#64748B",
                                         marginRight: 6,
-                                        fontSize: 11,
-                                    }}
-                                >
-                                    •
-                                </Text>
-                                <Text
-                                    style={{
+                                        fontSize: 11, }}
+                                >    •   </Text>
+                                <Text style={{
                                         flex: 1,
                                         color: "#64748B",
                                         fontSize: 11,
-                                        lineHeight: 16,
-                                    }}
+                                        lineHeight: 16, }}
                                 >
                                     Prepared interface mockups and presented
                                     design decisions to the team.
                                 </Text>
                             </View>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1E3A8A",
                                     fontSize: 11,
                                     fontWeight: "800",
                                     marginBottom: 8,
                                 }}
-                            >
-                                EDUCATION
-                            </Text>
+                            > EDUCATION </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1F2937",
                                     fontSize: 12,
                                     fontWeight: "700",
                                     marginBottom: 4,
                                 }}
-                            >
-                                AIT University
-                            </Text>
+                            > AIT University </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#64748B",
                                     fontSize: 10,
                                     marginBottom: 16,
                                 }}
-                            >
-                                BIT · 2026
-                            </Text>
+                            > BIT · 2026 </Text>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#1E3A8A",
                                     fontSize: 11,
                                     fontWeight: "800",
                                     marginBottom: 8,
                                 }}
-                            >
-                                KEY SKILLS
-                            </Text>
+                            > KEY SKILLS </Text>
 
-                            <View
-                                style={{
+                            <View style={{
                                     flexDirection: "row",
                                     flexWrap: "wrap",
-                                    gap: 6,
-                                }}
+                                    gap: 6, }}
                             >
                                 {["UI/UX", "Figma", "React", "Teamwork"].map(
                                     (skill) => (
-                                        <View
-                                            key={skill}
+                                        <View key={skill}
                                             style={{
                                                 backgroundColor: "#EFF6FF",
                                                 paddingHorizontal: 10,
@@ -612,14 +484,11 @@ export default function Guidelines() {
                                                 borderRadius: 6,
                                             }}
                                         >
-                                            <Text
-                                                style={{
+                                            <Text style={{
                                                     color: "#3B82F6",
                                                     fontSize: 10,
-                                                    fontWeight: "700",
-                                                }}
-                                            >
-                                                {skill}
+                                                    fontWeight: "700", }}
+                                            > {skill}
                                             </Text>
                                         </View>
                                     )
@@ -640,14 +509,10 @@ export default function Guidelines() {
                                 justifyContent: "center",
                                 marginTop: 14,
                                 shadowColor: "#1E3A8A",
-                                shadowOffset: {
-                                    width: 0,
-                                    height: 4,
-                                },
+                                shadowOffset: {width: 0, height: 4,},
                                 shadowOpacity: 0.2,
                                 shadowRadius: 6,
-                                elevation: 4,
-                            }}
+                                elevation: 4, }}
                         >
                             <Ionicons
                                 name="download-outline"
@@ -656,25 +521,19 @@ export default function Guidelines() {
                                 style={{ marginRight: 8 }}
                             />
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#FFFFFF",
                                     fontSize: 14,
-                                    fontWeight: "800",
-                                }}
-                            >
-                                Download Sample Template
-                            </Text>
+                                    fontWeight: "800", }}
+                            > Download Sample Template </Text>
                         </TouchableOpacity>
 
-                        <Text
-                            style={{
+                        <Text style={{
                                 color: "#64748B",
                                 fontSize: 11,
                                 lineHeight: 17,
                                 marginTop: 8,
-                                textAlign: "center",
-                            }}
+                                textAlign: "center", }}
                         >
                             Sample content for display purposes. Replace it
                             with your own accurate information.
@@ -682,8 +541,7 @@ export default function Guidelines() {
                     </View>
 
                     {/* Checklist */}
-                    <View
-                        style={{
+                    <View style={{
                             marginHorizontal: 20,
                             marginTop: 24,
                             marginBottom: 22,
@@ -691,66 +549,50 @@ export default function Guidelines() {
                             borderWidth: 1,
                             borderColor: "#E5EAF2",
                             borderRadius: 18,
-                            padding: 16,
-                        }}
+                            padding: 16, }}
                     >
-                        <View
-                            style={{
+                        <View style={{
                                 flexDirection: "row",
                                 alignItems: "center",
-                                justifyContent: "space-between",
-                            }}
+                                justifyContent: "space-between", }}
                         >
                             <View style={{ flex: 1 }}>
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#1F2937",
                                         fontSize: 18,
-                                        fontWeight: "800",
-                                    }}
-                                >
-                                    Checklist
-                                </Text>
+                                        fontWeight: "800", }}
+                                > Checklist </Text>
 
-                                <Text
-                                    style={{
+                                <Text style={{
                                         color: "#64748B",
                                         fontSize: 12,
-                                        marginTop: 5,
-                                    }}
-                                >
-                                    Check before you apply.
+                                        marginTop: 5, }}
+                                > Check before you apply. 
                                 </Text>
                             </View>
 
-                            <Text
-                                style={{
+                            <Text style={{
                                     color: "#EF4444",
                                     fontSize: 14,
-                                    fontWeight: "800",
-                                }}
+                                    fontWeight: "800", }}
                             >
                                 {checkedItems.length}/{checklist.length}
                             </Text>
                         </View>
 
-                        <View
-                            style={{
+                        <View style={{
                                 height: 6,
                                 backgroundColor: "#FCE7F3",
                                 borderRadius: 10,
                                 overflow: "hidden",
                                 marginTop: 16,
-                                marginBottom: 10,
-                            }}
+                                marginBottom: 10, }}
                         >
-                            <View
-                                style={{
+                            <View style={{
                                     height: "100%",
                                     width: `${progress * 100}%`,
                                     backgroundColor: "#EF4444",
-                                    borderRadius: 10,
-                                }}
+                                    borderRadius: 10, }}
                             />
                         </View>
 
@@ -765,8 +607,7 @@ export default function Guidelines() {
                                     style={{
                                         flexDirection: "row",
                                         alignItems: "center",
-                                        paddingVertical: 10,
-                                    }}
+                                        paddingVertical: 10, }}
                                 >
                                     <Ionicons
                                         name={
@@ -780,8 +621,7 @@ export default function Guidelines() {
                                         }
                                     />
 
-                                    <Text
-                                        style={{
+                                    <Text style={{
                                             flex: 1,
                                             color: isChecked
                                                 ? "#94A3B8"
@@ -791,41 +631,30 @@ export default function Guidelines() {
                                             marginLeft: 10,
                                             textDecorationLine: isChecked
                                                 ? "line-through"
-                                                : "none",
-                                        }}
-                                    >
-                                        {item}
-                                    </Text>
+                                                : "none", }}
+                                    > {item} </Text>
                                 </TouchableOpacity>
                             );
                         })}
                     </View>
 
                     {/* Australian Resources */}
-                    <View
-                        style={{
+                    <View style={{
                             paddingHorizontal: 20,
-                            marginBottom: 18,
-                        }}
+                            marginBottom: 18, }}
                     >
-                        <Text
-                            style={{
+                        <Text style={{
                                 color: "#1F2937",
                                 fontSize: 18,
                                 fontWeight: "800",
-                                marginBottom: 6,
-                            }}
-                        >
-                            Helpful Australian Resources
-                        </Text>
+                                marginBottom: 6, }}
+                        > Helpful Australian Resources </Text>
 
-                        <Text
-                            style={{
+                        <Text style={{
                                 color: "#64748B",
                                 fontSize: 12,
                                 lineHeight: 18,
-                                marginBottom: 14,
-                            }}
+                                marginBottom: 14, }}
                         >
                             Explore these resources for further advice,
                             examples and job application tips.
@@ -847,16 +676,14 @@ export default function Guidelines() {
                                     marginBottom: 10,
                                 }}
                             >
-                                <View
-                                    style={{
+                                <View style={{
                                         width: 38,
                                         height: 38,
                                         borderRadius: 11,
                                         backgroundColor: "#FDF2F8",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        marginRight: 12,
-                                    }}
+                                        marginRight: 12, }}
                                 >
                                     <Ionicons
                                         name="open-outline"
@@ -866,22 +693,18 @@ export default function Guidelines() {
                                 </View>
 
                                 <View style={{ flex: 1 }}>
-                                    <Text
-                                        style={{
+                                    <Text style={{
                                             color: "#1F2937",
                                             fontSize: 13,
-                                            fontWeight: "800",
-                                        }}
+                                            fontWeight: "800", }}
                                     >
                                         {resource.title}
                                     </Text>
 
-                                    <Text
-                                        style={{
+                                    <Text style={{
                                             color: "#64748B",
                                             fontSize: 11,
-                                            marginTop: 4,
-                                        }}
+                                            marginTop: 4, }}
                                     >
                                         {resource.subtitle}
                                     </Text>
@@ -896,17 +719,15 @@ export default function Guidelines() {
                         ))}
                     </View>
 
-                    {/* Footer Note */}
-                    <View
-                        style={{
+                    {/* Footer */}
+                    <View style={{
                             flexDirection: "row",
                             alignItems: "flex-start",
                             marginHorizontal: 20,
                             marginBottom: 12,
                             padding: 14,
                             backgroundColor: "#FDF2F8",
-                            borderRadius: 14,
-                        }}
+                            borderRadius: 14, }}
                     >
                         <Ionicons
                             name="information-circle-outline"
@@ -914,8 +735,7 @@ export default function Guidelines() {
                             color="#EF4444"
                         />
 
-                        <Text
-                            style={{
+                        <Text style={{
                                 flex: 1,
                                 color: "#64748B",
                                 fontSize: 11,
