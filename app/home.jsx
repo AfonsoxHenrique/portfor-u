@@ -56,7 +56,7 @@ const Home = () => {
                         stat={`${MOCK_CREDENTIALS.resumeFileCount} files`}
                         statColor={colors.accentBlue}
                         subtitle={`Latest: ${MOCK_CREDENTIALS.latestResumeName}`}
-                        onPress={() => router.push('/resumes')}
+                        onPress={() => router.push('/resume')}
                     />
 
                     <CredentialCard

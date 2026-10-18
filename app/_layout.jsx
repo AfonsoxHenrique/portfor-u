@@ -9,6 +9,7 @@ const RootLayout = () => {
             <Stack.Screen name="home" />
             <Stack.Screen name="resume"/>
             <Stack.Screen name="profile"/>
+            
         </Stack>
     )
 }

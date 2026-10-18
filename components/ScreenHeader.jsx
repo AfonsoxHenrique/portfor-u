@@ -7,17 +7,22 @@ const ScreenHeader = ({ title, subtitle, bg, subtitleColor }) => {
     const router = useRouter()
 
     return (
+
         <View style={[styles.header, { backgroundColor: bg }]}>
-            <View style={styles.titleRow}>
-                <TouchableOpacity style={styles.backButton} activeOpacity={0.7} onPress={() => router.back()}>
-                    <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <Text style={styles.title}>{title}</Text>
-            </View>
-            {!!subtitle && (
-                <Text style={[styles.subtitle, { color: subtitleColor }]}>{subtitle}</Text>
-            )}
-        </View>
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        accessibilityLabel="Go back"
+                        activeOpacity={0.75}
+                        style={styles.backButton}
+                    >
+                        <Ionicons name="chevron-back-outline" size={20} color="#1F2937" />
+                    </TouchableOpacity>
+        
+                    <View style={styles.textBlock}>
+                        <Text style={styles.title}>{title}</Text>
+                        {!!subtitle && <Text style={[styles.subtitle, { color: subtitleColor }]}>{subtitle}</Text>}
+                    </View>
+                </View>
     )
 }
 
@@ -28,14 +33,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.md,
         paddingBottom: spacing.lg,
-    },
-    titleRow: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     backButton: {
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
         borderRadius: radius.md,
         backgroundColor: colors.white,
         alignItems: 'center',
@@ -47,16 +50,18 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         elevation: 3,
     },
+    textBlock: {
+        flex: 1,
+    },
     title: {
-        fontSize: 26,
+        fontSize: 20,
         fontWeight: '800',
         color: colors.textPrimary,
     },
     subtitle: {
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1,
         marginTop: spacing.sm,
-        marginLeft: 40 + spacing.md,
     },
 })

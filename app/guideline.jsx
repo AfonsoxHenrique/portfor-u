@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { colors, spacing, radius } from "../theme/colors";
+import { spacing } from "../theme/colors";
+import ScreenHeader from "../components/ScreenHeader";
 import BottomTabBar from "../components/BottomTabBar";
 
 const sections = [
@@ -79,7 +79,6 @@ const resources = [
 ];
 
 export default function Guidelines() {
-    const router = useRouter();
     const [checkedItems, setCheckedItems] = useState([]);
 
     const toggleChecklistItem = (item) => {
@@ -116,7 +115,7 @@ export default function Guidelines() {
                 flex: 1,
                 backgroundColor: "#F7F9FC",
             }}
-            edges={["top"]}
+            edges={['top', 'bottom']}
         >
             <View style={{ flex: 1 }}>
                 <ScrollView
@@ -125,64 +124,12 @@ export default function Guidelines() {
                     }}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Header */}
-                    <View
-                        style={{
-                            backgroundColor: "#FDF2F8",
-                            paddingHorizontal: 20,
-                            paddingTop: 16,
-                            paddingBottom: 20,
-                            flexDirection: "row",
-                            alignItems: "center",
-                        }}
-                    >
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            accessibilityLabel="Go back"
-                            activeOpacity={0.75}
-                            style={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: 12,
-                                backgroundColor: "#FFFFFF",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                marginRight: 14,
-                                borderWidth: 1,
-                                borderColor: "#E5EAF2",
-                            }}
-                        >
-                            <Ionicons
-                                name="chevron-back-outline"
-                                size={20}
-                                color="#1F2937"
-                            />
-                        </TouchableOpacity>
-
-                        <View style={{ flex: 1 }}>
-                            <Text
-                                style={{
-                                    color: "#1F2937",
-                                    fontSize: 20,
-                                    fontWeight: "800",
-                                }}
-                            >
-                                Resume Guideline
-                            </Text>
-
-                            <Text
-                                style={{
-                                    color: "#EF4444",
-                                    fontSize: 10,
-                                    fontWeight: "800",
-                                    letterSpacing: 0.8,
-                                    marginTop: 3,
-                                }}
-                            >
-                                HOW TO WRITE A STRONG RESUME
-                            </Text>
-                        </View>
-                    </View>
+                    <ScreenHeader
+                        title="Resume Guideline"
+                        subtitle="HOW TO WRITE A STRONG RESUME"
+                        bg="#FDF2F8"
+                        subtitleColor="#EF4444"
+                    />
 
                     {/* Introduction */}
                     <View
@@ -932,7 +879,7 @@ export default function Guidelines() {
                     </View>
                 </ScrollView>
 
-                <BottomTabBar activeTab="guidelines" />
+                <BottomTabBar activeTab="guideline" />
             </View>
         </SafeAreaView>
     );
