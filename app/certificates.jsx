@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { colors, spacing, radius } from "../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../components/ScreenHeader";
@@ -31,13 +32,17 @@ const MOCK_CERTIFICATES = [
 ]
 
 const Certificates = () => {
+    const router = useRouter()
 
     const handleAdd = () => {
-        console.log('Add new certificate')
+        router.push('/add-certificate')
     }
 
     const handleCertPress = (id) => {
         console.log('View cert', id)
+    }
+    const handleDelete = (id) => {      
+        console.log('Delete cert', id)
     }
 
     return (
@@ -58,21 +63,25 @@ const Certificates = () => {
                     <View style={styles.body}>
                         <View style={styles.grid}>
                             {MOCK_CERTIFICATES.map((cert) => (
-                                <TouchableOpacity
-                                    key={cert.id}
-                                    style={styles.certCard}
-                                    activeOpacity={0.7}
-                                    onPress={() => handleCertPress(cert.id)}
-                                >
-                                    <Image
-                                        source={cert.logo}
-                                        style={styles.logoImage}
-                                        resizeMode="contain"
-                                    />
-                                    <Text style={styles.certName}>{cert.name}</Text>
-                                    <Text style={styles.certIssuer}>{cert.issuer}</Text>
-                                    <Text style={styles.certDate}>{cert.earnedDate}</Text>
-                                </TouchableOpacity>
+                                <View key={cert.id} style={styles.certCard}>
+                                    <TouchableOpacity
+                                        style={styles.deleteIconBtn}
+                                        onPress={() => handleDelete(cert.id)}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons name="trash" size={14} color={colors.red} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => handleCertPress(cert.id)}>
+                                        <Image
+                                            source={cert.logo}
+                                            style={styles.logoImage}
+                                            resizeMode="contain"
+                                        />
+                                        <Text style={styles.certName}>{cert.name}</Text>
+                                        <Text style={styles.certIssuer}>{cert.issuer}</Text>
+                                        <Text style={styles.certDate}>{cert.earnedDate}</Text>
+                                    </TouchableOpacity>
+                                </View>
                             ))}
 
                             {/* Add New Badge Card */}
@@ -224,4 +233,18 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.75)',
         lineHeight: 18,
     },
+    
+    deleteIconBtn: {
+        position: 'absolute',
+        top: spacing.sm,
+        right: spacing.sm,
+        width: 28,
+        height: 28,
+        borderRadius: radius.pill,
+        backgroundColor: colors.redTint,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1,
+    },
 })
+
