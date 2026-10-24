@@ -40,7 +40,7 @@ const WorkExperience = () => {
     }
 
     const handleAdd = () => {
-        // navigate to add screen
+        router.push('/add-work-experience')
         console.log('Add new experience')
     }
 
@@ -103,7 +103,7 @@ const WorkExperience = () => {
                     </View>
                 </ScrollView>
 
-                <BottomTabBar activeTab="profile" />
+                <BottomTabBar activeTab="work-experience" />
             </SafeAreaView>
         </SafeAreaProvider>
     )

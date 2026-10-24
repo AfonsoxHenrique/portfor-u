@@ -98,12 +98,6 @@ const Profile = () => {
                             onPress={() => router.push('/notifications')}
                             showDivider
                         />
-                        <SettingsRow
-                            icon="download-outline"
-                            title="Import Data"
-                            subtitle="PDF / JPEG"
-                            onPress={() => router.push('/import-data')}
-                        />
                     </SectionGroup>
 
                     <SectionGroup title="PRIVACY">

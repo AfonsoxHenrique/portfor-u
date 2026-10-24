@@ -112,7 +112,7 @@ const Certificates = () => {
                     </View>
                 </ScrollView>
 
-                <BottomTabBar activeTab="profile" />
+                <BottomTabBar activeTab="certificates" />
             </SafeAreaView>
         </SafeAreaProvider>
     )
