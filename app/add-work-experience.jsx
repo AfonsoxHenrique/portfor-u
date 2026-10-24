@@ -1,9 +1,18 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import { useState } from "react";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { colors, spacing, radius } from "../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../components/ScreenHeader";
+import {
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    updateDoc,
+    serverTimestamp,
+} from "firebase/firestore";
+import { auth, db } from "../firebase/firebase";
 
 const AddWorkExperience = () => {
     const router = useRouter()
@@ -17,10 +26,115 @@ const AddWorkExperience = () => {
     const [endDate, setEndDate] = useState('')
     const [description, setDescription] = useState('')
 
-    const handleSave = () => {
-        // savefunction
-        router.back()
-    }
+    const [saving, setSaving] = useState(false);
+
+
+        useEffect(() => {
+        const loadExperience = async () => {
+            if (!id) return;
+
+            try {
+                const user = auth.currentUser;
+
+                if (!user) {
+                    Alert.alert("Error", "Please log in first.");
+                    return;
+                }
+
+                const experienceRef = doc(
+                    db,
+                    "users",
+                    user.uid,
+                    "workExperience",
+                    String(id)
+                );
+
+                const snapshot = await getDoc(experienceRef);
+
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+
+                    setJobTitle(data.jobTitle || "");
+                    setCompany(data.company || "");
+                    setLocation(data.location || "");
+                    setStartDate(data.startDate || "");
+                    setEndDate(data.endDate || "");
+                    setDescription(data.description || "");
+                } else {
+                    Alert.alert("Error", "Experience not found.");
+                }
+            } catch (error) {
+                console.error("Error loading experience:", error);
+                Alert.alert("Error", "Could not load this experience.");
+            }
+        };
+
+        loadExperience();
+    }, [id]);
+
+    const handleSave = async () => {
+        const user = auth.currentUser;
+
+        if (!user) {
+            Alert.alert("Error", "Please log in first.");
+            return;
+        }
+
+        if (!jobTitle.trim() || !company.trim()) {
+            Alert.alert(
+                "Missing information",
+                "Please enter at least a job title and company."
+            );
+            return;
+        }
+
+        setSaving(true);
+
+        try {
+            const experienceData = {
+                jobTitle: jobTitle.trim(),
+                company: company.trim(),
+                location: location.trim(),
+                startDate: startDate.trim(),
+                endDate: endDate.trim(),
+                description: description.trim(),
+                updatedAt: serverTimestamp(),
+            };
+
+            if (isEditing) {
+                await updateDoc(
+                    doc(
+                        db,
+                        "users",
+                        user.uid,
+                        "workExperience",
+                        String(id)
+                    ),
+                    experienceData
+                );
+            } else {
+                await addDoc(
+                    collection(
+                        db,
+                        "users",
+                        user.uid,
+                        "workExperience"
+                    ),
+                    {
+                        ...experienceData,
+                        createdAt: serverTimestamp(),
+                    }
+                );
+            }
+
+            router.back();
+        } catch (error) {
+            console.error("Error saving experience:", error);
+            Alert.alert("Error", "Could not save the work experience.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <SafeAreaProvider>
@@ -96,9 +210,18 @@ const AddWorkExperience = () => {
                             textAlignVertical="top"
                         />
 
-                        <TouchableOpacity style={styles.saveButton} activeOpacity={0.85} onPress={handleSave}>
+                        <TouchableOpacity
+                            style={styles.saveButton}
+                            activeOpacity={0.85}
+                            onPress={handleSave}
+                            disabled={saving}
+                        >
                             <Text style={styles.saveButtonText}>
-                                {isEditing ? 'Save Changes' : 'Save Experience'}
+                                {saving
+                                    ? "Saving..."
+                                    : isEditing
+                                        ? "Save Changes"
+                                        : "Save Experience"}
                             </Text>
                         </TouchableOpacity>
 

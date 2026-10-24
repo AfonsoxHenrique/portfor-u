@@ -1,43 +1,115 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, spacing, radius } from "../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../components/ScreenHeader";
 import BottomTabBar from "../components/BottomTabBar";
-
-// Replace with real data from Firebase
-const MOCK_EXPERIENCES = [
-    {
-        id: '1',
-        title: 'Software Engineering Intern',
-        company: 'TechCorp Industries',
-        duration: 'Jun 2025 - Aug 2025',
-        location: 'San Francisco, CA (Remote)',
-        description: 'Developed API integrations using Node.js and improved frontend dashboard rendering speed by 24% using React.',
-    },
-    {
-        id: '2',
-        title: 'Lead Student Developer',
-        company: 'University Computer Science Club',
-        duration: 'Sep 2024 - May 2025',
-        location: 'Campus',
-        description: 'Led a team of 6 developers to build a student scheduling assistant web app used by over 500 graduates.',
-    },
-]
+import {
+    collection,
+    onSnapshot,
+    doc,
+    deleteDoc,
+} from "firebase/firestore";
+import { auth, db } from "../firebase/firebase";
 
 const WorkExperience = () => {
     const router = useRouter()
+    const [experiences, setExperiences] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const user = auth.currentUser;
+
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
+        const experiencesRef = collection(
+            db,
+            "users",
+            user.uid,
+            "workExperience"
+        );
+
+        const unsubscribe = onSnapshot(
+            experiencesRef,
+            (snapshot) => {
+                const items = snapshot.docs.map((item) => ({
+                    id: item.id,
+                    ...item.data(),
+                }));
+
+                items.sort((a, b) => {
+                    const dateA = a.updatedAt?.toDate?.()?.getTime() || 0;
+                    const dateB = b.updatedAt?.toDate?.()?.getTime() || 0;
+                    return dateB - dateA;
+                });
+
+                setExperiences(items);
+                setLoading(false);
+            },
+            (error) => {
+                console.error("Error loading work experience:", error);
+                Alert.alert("Error", "Could not load work experience.");
+                setLoading(false);
+            }
+        );
+
+        return unsubscribe;
+    }, []);
 
     const handleEdit = (id) => {
-        // navigate to edit screen
-        console.log('Edit', id)
-    }
+        router.push({
+            pathname: "/add-work-experience",
+            params: { id },
+        });
+    };
 
     const handleDelete = (id) => {
-        // delete experience
-        console.log('Delete', id)
-    }
+        Alert.alert(
+            "Delete Experience",
+            "Are you sure you want to delete this work experience?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        const user = auth.currentUser;
+
+                        if (!user) {
+                            Alert.alert("Error", "Please log in first.");
+                            return;
+                        }
+
+                        try {
+                            await deleteDoc(
+                                doc(
+                                    db,
+                                    "users",
+                                    user.uid,
+                                    "workExperience",
+                                    id
+                                )
+                            );
+                        } catch (error) {
+                            console.error("Error deleting experience:", error);
+                            Alert.alert(
+                                "Error",
+                                "Could not delete this experience."
+                            );
+                        }
+                    },
+                },
+            ]
+        );
+    };
 
     const handleAdd = () => {
         router.push('/add-work-experience')
@@ -54,43 +126,73 @@ const WorkExperience = () => {
                 >
                     <ScreenHeader
                         title="Work Experience"
-                        subtitle={`${MOCK_EXPERIENCES.length} ENTRIES RECORDED`}
+                        subtitle={`${experiences.length} ENTRIES RECORDED`}
                         bg={colors.successTint}
                         subtitleColor={colors.success}
                     />
 
                     <View style={styles.body}>
-                        {MOCK_EXPERIENCES.map((exp) => (
-                            <View key={exp.id} style={styles.card}>
-                                <View style={styles.cardHeader}>
-                                    <View style={styles.cardTitleBlock}>
-                                        <Text style={styles.jobTitle}>{exp.title}</Text>
-                                        <Text style={styles.company}>{exp.company}</Text>
-                                    </View>
-                                    <View style={styles.actionButtons}>
-                                        <TouchableOpacity
-                                            style={styles.editButton}
-                                            activeOpacity={0.7}
-                                            onPress={() => handleEdit(exp.id)}
-                                        >
-                                            <Ionicons name="pencil-outline" size={16} color={colors.accentBlue} />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.deleteButton}
-                                            activeOpacity={0.7}
-                                            onPress={() => handleDelete(exp.id)}
-                                        >
-                                            <Ionicons name="trash-outline" size={16} color={colors.red} />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
+                        {loading ? (
+                            <Text style={styles.description}>
+                                Loading experiences...
+                            </Text>
+                        ) : experiences.length === 0 ? (
+                            <Text style={styles.description}>
+                                No work experience added yet. Tap below to add your first entry.
+                            </Text>
+                        ) : (
+                            experiences.map((exp) => (
+                                <View key={exp.id} style={styles.card}>
+                                    <View style={styles.cardHeader}>
+                                        <View style={styles.cardTitleBlock}>
+                                            <Text style={styles.jobTitle}>
+                                                {exp.jobTitle}
+                                            </Text>
+                                            <Text style={styles.company}>
+                                                {exp.company}
+                                            </Text>
+                                        </View>
 
-                                <Text style={styles.duration}>
-                                    {exp.duration} | {exp.location}
-                                </Text>
-                                <Text style={styles.description}>{exp.description}</Text>
-                            </View>
-                        ))}
+                                        <View style={styles.actionButtons}>
+                                            <TouchableOpacity
+                                                style={styles.editButton}
+                                                activeOpacity={0.7}
+                                                onPress={() => handleEdit(exp.id)}
+                                            >
+                                                <Ionicons
+                                                    name="pencil-outline"
+                                                    size={16}
+                                                    color={colors.accentBlue}
+                                                />
+                                            </TouchableOpacity>
+
+                                            <TouchableOpacity
+                                                style={styles.deleteButton}
+                                                activeOpacity={0.7}
+                                                onPress={() => handleDelete(exp.id)}
+                                            >
+                                                <Ionicons
+                                                    name="trash-outline"
+                                                    size={16}
+                                                    color={colors.red}
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+
+                                    <Text style={styles.duration}>
+                                        {exp.startDate || "Start date not specified"}
+                                        {" - "}
+                                        {exp.endDate || "Present"}
+                                        {exp.location ? ` | ${exp.location}` : ""}
+                                    </Text>
+
+                                    <Text style={styles.description}>
+                                        {exp.description || "No description provided."}
+                                    </Text>
+                                </View>
+                            ))
+                        )}
 
                         <TouchableOpacity
                             style={styles.addButton}
@@ -98,11 +200,12 @@ const WorkExperience = () => {
                             onPress={handleAdd}
                         >
                             <Ionicons name="add" size={20} color={colors.success} />
-                            <Text style={styles.addButtonText}>Add New Experience</Text>
+                            <Text style={styles.addButtonText}>
+                                Add New Experience
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-
                 <BottomTabBar activeTab="work-experience" />
             </SafeAreaView>
         </SafeAreaProvider>
