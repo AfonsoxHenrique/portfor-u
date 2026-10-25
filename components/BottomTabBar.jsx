@@ -9,7 +9,8 @@ import { colors, spacing } from "../theme/colors";
 const TABS = [
     { key: 'home', label: 'Home', icon: 'home', route: '/home' },
     { key: 'resumes', label: 'Resume', icon: 'document-text-outline', route: '/resume' },
-    { key: 'guideline', label: 'Guideline', icon: 'locate-outline', route: '/guideline' },
+    { key: 'work-experience', label: 'Experience', icon: 'briefcase-outline', route: '/work-experience' },
+    { key: 'certificates', label: 'Certificates', icon: 'ribbon-outline', route: '/certificates' },
     { key: 'profile', label: 'Profile', icon: 'person-outline', route: '/profile' },
 ]
 

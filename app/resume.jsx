@@ -1,108 +1,233 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import { useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, spacing, radius } from "../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../components/ScreenHeader";
+import TipCard from "../components/TipCard";
+import FloatingActionButton from "../components/FloatingActionButton";
 import BottomTabBar from "../components/BottomTabBar";
-
-// Replace with data from firebase.
-const MOCK_RESUME_FILE = {
-    name: 'SWE_Intern_Resume.pdf',
-    sizeLabel: '4.2 MB',
-    updatedLabel: 'Updated 3d ago',
-}
+import { useEffect, useState } from "react";
+import { onSnapshot, collection, doc, deleteDoc } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
+import { auth, db, storage } from "../firebase/firebase";
 
 const Resumes = () => {
-    const router = useRouter()
-    const [title, setTitle] = useState('SWE Intern Resume - Fall 2026')
-    const [targetRole, setTargetRole] = useState('Junior Software Engineer')
-    const [industry, setIndustry] = useState('Technology & Software Development')
+    const router = useRouter();
 
-    const handleSave = () => {
-        //saving resume
-    }
+    const [resumes, setResumes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleUpload = () => {
-        // upload pdf function
-    }
+        useEffect(() => {
+            const user = auth.currentUser;
+
+            if (!user) {
+                setLoading(false);
+                Alert.alert(
+                    "Login required",
+                    "Please log in to view your resumes."
+                );
+                return;
+            }
+
+            const resumesRef = collection(
+                db,
+                "users",
+                user.uid,
+                "resumes"
+            );
+
+            const unsubscribe = onSnapshot(
+                resumesRef,
+                (snapshot) => {
+                    const resumeList = snapshot.docs.map((document) => ({
+                        id: document.id,
+                        ...document.data(),
+                    }));
+
+                    resumeList.sort((a, b) => {
+                        const dateA = a.updatedAt?.toDate?.()?.getTime() || 0;
+                        const dateB = b.updatedAt?.toDate?.()?.getTime() || 0;
+                        return dateB - dateA;
+                    });
+
+                    setResumes(resumeList);
+                    setLoading(false);
+                },
+                (error) => {
+                    console.error("Error loading resumes:", error);
+                    setLoading(false);
+                    Alert.alert("Error", "Could not load your resumes.");
+                }
+            );
+
+            return unsubscribe;
+        }, []);
+
+
+        const handleView = async (resume) => {
+            if (!resume.downloadURL) {
+                Alert.alert(
+                    "File unavailable",
+                    "There is no download link for this resume."
+                );
+                return;
+            }
+
+            try {
+                await Linking.openURL(resume.downloadURL);
+            } catch (error) {
+                console.error("Error opening resume:", error);
+                Alert.alert("Error", "Could not open this resume.");
+            }
+        };
+
+        const handleDelete = (resume) => {
+            Alert.alert(
+                "Delete Resume",
+                `Remove "${resume.fileName || resume.name}" from your resumes?`,
+                [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: async () => {
+                            try {
+                                const user = auth.currentUser;
+
+                                if (!user) {
+                                    Alert.alert("Error", "Please log in again.");
+                                    return;
+                                }
+
+                                //deletes the file from Firebase Storage.
+                                if (resume.storagePath) {
+                                    try {
+                                        await deleteObject(
+                                            ref(storage, resume.storagePath)
+                                        );
+                                    } catch (storageError) {
+                                        if (
+                                            storageError.code !==
+                                            "storage/object-not-found"
+                                        ) {
+                                            throw storageError;
+                                        }
+                                    }
+                                }
+
+                                //delete the resume details from Firestore.
+                                await deleteDoc(
+                                    doc(
+                                        db,
+                                        "users",
+                                        user.uid,
+                                        "resumes",
+                                        resume.id
+                                    )
+                                );
+                            } catch (error) {
+                                console.error("Error deleting resume:", error);
+                                Alert.alert(
+                                    "Error",
+                                    "Could not delete the resume. Please try again."
+                                );
+                            }
+                        },
+                    },
+                ]
+            );
+        };
 
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-                <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+                <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <ScreenHeader
-                    title="My Resumes"
-                    subtitle="2 FILES UPLOADED"
-                    bg={colors.lightBlueTint}
-                    subtitleColor={colors.accentBlue}
+                        title="My Resumes"
+                        subtitle={`${resumes.length} FILE${resumes.length === 1 ? "" : "S"} UPLOADED`}
+                        bg={colors.lightBlueTint}
+                        subtitleColor={colors.accentBlue}
                     />
+
                     <View style={styles.body}>
-                        <View style={styles.fileCard}>
-                            <View style={styles.fileIconChip}>
-                                <Ionicons name="document-text" size={18} color={colors.custom2} />
-                            </View>
-                            <View style={styles.fileTextBlock}>
-                                <Text style={styles.fileName}>{MOCK_RESUME_FILE.name}</Text>
-                                <Text style={styles.fileMeta}>
-                                    {MOCK_RESUME_FILE.sizeLabel} • {MOCK_RESUME_FILE.updatedLabel}
-                                </Text>
-                            </View>
-                            <TouchableOpacity style={styles.viewButton} activeOpacity={0.7}>
-                                <Text style={styles.viewButtonText}>View</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity style={styles.uploadBox} activeOpacity={0.7} onPress={handleUpload}>
-                            <View style={styles.uploadIconChip}>
-                                <Ionicons name="cloud-upload-outline" size={20} color={colors.accentBlue} />
-                            </View>
-                            <Text style={styles.uploadTitle}>Upload a new version</Text>
-                            <Text style={styles.uploadHint}>PDF, DOCX up to 10MB</Text>
-                        </TouchableOpacity>
-
-                        <Text style={styles.sectionTitle}>Resume Details</Text>
-
-                        <Text style={styles.label}>Resume Title</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={title}
-                            onChangeText={setTitle}
-                            placeholderTextColor={colors.textMuted}
-                        />
-
-                        <Text style={styles.label}>Target Role / Tagline</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={targetRole}
-                            onChangeText={setTargetRole}
-                            placeholderTextColor={colors.textMuted}
-                        />
-
-                        <Text style={styles.label}>Primary Industry</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={industry}
-                            onChangeText={setIndustry}
-                            placeholderTextColor={colors.textMuted}
-                        />
-
-                        <TouchableOpacity style={styles.saveButton} activeOpacity={0.85} onPress={handleSave}>
-                            <Text style={styles.saveButtonText}>Save Resume Settings</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.analyzerButton}
-                            activeOpacity={0.85}
+                        <TipCard
+                            icon="sparkles"
+                            title="Resume Analyzer"
+                            body="Tip: review your resume and get feedback and improvement suggestions."
                             onPress={() => router.push('/resume-analyzer')}
-                        >
-                            <Text style={styles.analyzerButtonText}>Resume Analyzer</Text>
-                        </TouchableOpacity>
-                    </View>
-                    
-                </ScrollView>
+                        />
+                        {loading && (<Text style={{ color: colors.textMuted, marginBottom: spacing.md }}>
+                        Loading resumes...</Text>)}
 
+                        {resumes.map((resume) => (
+                            <View key={resume.id} style={styles.resumeCard}>
+                                <View style={styles.cardHeaderRow}>
+                                    <View style={styles.fileIconChip}>
+                                        <Ionicons name="document-text" size={18} color={colors.accentBlue} />
+                                    </View>
+                                    <View style={styles.fileTextBlock}>
+                                        <Text style={styles.fileName}>
+                                            {resume.fileName || resume.name || "Resume"}
+                                        </Text>
+
+                                        <Text style={styles.fileMeta}>
+                                            {resume.size
+                                                ? `${(resume.size / (1024 * 1024)).toFixed(1)} MB`
+                                                : "File size unavailable"}
+                                            {" • "}
+                                            {resume.updatedAt?.toDate
+                                                ? `Updated ${resume.updatedAt.toDate().toLocaleDateString()}`
+                                                : "Recently uploaded"}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.actions}>
+                                        <TouchableOpacity
+                                            style={styles.viewButton}
+                                            activeOpacity={0.7}
+                                            onPress={() => handleView(resume)}
+                                        >
+                                            <Ionicons
+                                                name="eye-outline"
+                                                size={14}
+                                                color={colors.accentBlue}
+                                            />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.editButton}
+                                            activeOpacity={0.7}
+                                            onPress={() => handleEdit(resume)}
+                                        >
+                                            <Ionicons name="pencil" size={14} color={colors.accentBlue} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.deleteButton}
+                                            activeOpacity={0.7}
+                                            onPress={() => handleDelete(resume)}
+                                        >
+                                            <Ionicons name="trash" size={14} color={colors.red} />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
+                                <View style={styles.divider} />
+
+                                <Text style={styles.resumeTitle}>{resume.title}</Text>
+
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.infoLabel}>Target Role</Text>
+                                    <Text style={styles.infoValue}>{resume.targetRole}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.infoLabel}>Primary Industry</Text>
+                                    <Text style={styles.infoValue}>{resume.industry}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                </ScrollView>
+                <FloatingActionButton onPress={() => router.push('/add-resume')} />
+                
                 <BottomTabBar activeTab="resumes" />
             </SafeAreaView>
         </SafeAreaProvider>
@@ -126,16 +251,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.lg,
     },
-
-    fileCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    resumeCard: {
         backgroundColor: colors.background,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,
         padding: spacing.md,
         marginBottom: spacing.md,
+    },
+    cardHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     fileIconChip: {
         width: 36,
@@ -159,92 +285,60 @@ const styles = StyleSheet.create({
         color: colors.textMuted,
         marginTop: 2,
     },
-    viewButton: {
-        backgroundColor: colors.lightBlueTint,
-        borderRadius: radius.pill,
-        paddingHorizontal: spacing.md,
-        paddingVertical: 6,
+    actions: {
+        flexDirection: 'row',
+        gap: spacing.xs,
     },
-    viewButtonText: {
-        fontSize: 12.5,
-        fontWeight: '700',
-        color: colors.accentBlue,
-    },
-    uploadBox: {
-        borderWidth: 1.5,
-        borderColor: colors.accentBlue,
-        borderStyle: 'dashed',
-        borderRadius: radius.md,
-        alignItems: 'center',
-        paddingVertical: spacing.lg,
-        marginBottom: spacing.lg,
-    },
-    uploadIconChip: {
-        width: 36,
-        height: 36,
-        borderRadius: radius.pill,
+    editButton: {
+        width: 28,
+        height: 28,
+        borderRadius: radius.sm,
         backgroundColor: colors.lightBlueTint,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    viewButton: {
+        width: 28,
+        height: 28,
+        borderRadius: radius.sm,
+        backgroundColor: colors.lightBlueTint,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    deleteButton: {
+        width: 28,
+        height: 28,
+        borderRadius: radius.sm,
+        backgroundColor: colors.redTint,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: colors.border,
+        marginVertical: spacing.md,
+    },
+    resumeTitle: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: colors.textPrimary,
         marginBottom: spacing.sm,
     },
-    uploadTitle: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: colors.textPrimary,
-    },
-    uploadHint: {
-        fontSize: 12,
-        color: colors.textMuted,
-        marginTop: 2,
-    },
-    sectionTitle: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: colors.textPrimary,
-        marginBottom: spacing.md,
-    },
-    label: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: colors.textPrimary,
-        marginBottom: spacing.xs,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.surface,
-        borderRadius: radius.md,
-        paddingHorizontal: spacing.md,
-        paddingVertical: 12,
-        fontSize: 14,
-        color: colors.textPrimary,
-        marginBottom: spacing.md,
-    },
-    saveButton: {
-        backgroundColor: colors.navy,
-        borderRadius: radius.md,
-        paddingVertical: 14,
-        alignItems: 'center',
+    infoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginTop: spacing.xs,
     },
-    saveButtonText: {
-        color: colors.white,
-        fontSize: 15,
-        fontWeight: '700',
+    infoLabel: {
+        fontSize: 12.5,
+        color: colors.textMuted,
     },
-    analyzerButton: {
-        backgroundColor: colors.custom10,
-        borderWidth: 1,
-        borderColor: colors.custom9,
-        borderRadius: radius.md,
-        paddingVertical: 14,
-        alignItems: 'center',
-        marginTop: spacing.sm,
-    },
-    analyzerButtonText: {
-        color: colors.custom9,
-        fontSize: 15,
-        fontWeight: '700',
+    infoValue: {
+        fontSize: 12.5,
+        fontWeight: '600',
+        color: colors.textPrimary,
+        flexShrink: 1,
+        textAlign: 'right',
+        marginLeft: spacing.md,
     },
 })
