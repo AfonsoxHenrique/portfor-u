@@ -80,13 +80,13 @@ const Profile = () => {
                         <SettingsRow
                             icon="person-outline"
                             title="Edit Profile"
-                            onPress={() => router.push('/edit-profile')}
+                            onPress={() => router.push('/editprofile')}
                             showDivider
                         />
                         <SettingsRow
                             icon="key-outline"
                             title="Change Password"
-                            onPress={() => router.push('/change-password')}
+                            onPress={() => router.push('/changepass')}
                         />
                     </SectionGroup>
 
