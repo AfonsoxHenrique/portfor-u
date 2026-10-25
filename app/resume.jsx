@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, spacing, radius } from "../theme/colors";
@@ -7,37 +7,137 @@ import ScreenHeader from "../components/ScreenHeader";
 import TipCard from "../components/TipCard";
 import FloatingActionButton from "../components/FloatingActionButton";
 import BottomTabBar from "../components/BottomTabBar";
-
-// Replace with real data from your resume storage / API.
-const MOCK_RESUMES = [
-    {
-        id: '1',
-        fileName: 'SWE_Intern_Resume.pdf',
-        sizeLabel: '4.2 MB',
-        updatedLabel: 'Updated 3d ago',
-        title: 'SWE Intern Resume - Fall 2026',
-        targetRole: 'Junior Software Engineer',
-        industry: 'Technology & Software Development',
-    },
-]
+import { useEffect, useState } from "react";
+import { onSnapshot, collection, doc, deleteDoc } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
+import { auth, db, storage } from "../firebase/firebase";
 
 const Resumes = () => {
-    const router = useRouter()
+    const router = useRouter();
 
-    const handleEdit = (resume) => {
-        router.push({ pathname: '/add-resume', params: { id: resume.id } })
-    }
+    const [resumes, setResumes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleDelete = (resume) => {
-        Alert.alert(
-            'Delete Resume',
-            `Remove "${resume.fileName}" from your resumes?`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive' },
-            ]
-        )
-    }
+        useEffect(() => {
+            const user = auth.currentUser;
+
+            if (!user) {
+                setLoading(false);
+                Alert.alert(
+                    "Login required",
+                    "Please log in to view your resumes."
+                );
+                return;
+            }
+
+            const resumesRef = collection(
+                db,
+                "users",
+                user.uid,
+                "resumes"
+            );
+
+            const unsubscribe = onSnapshot(
+                resumesRef,
+                (snapshot) => {
+                    const resumeList = snapshot.docs.map((document) => ({
+                        id: document.id,
+                        ...document.data(),
+                    }));
+
+                    resumeList.sort((a, b) => {
+                        const dateA = a.updatedAt?.toDate?.()?.getTime() || 0;
+                        const dateB = b.updatedAt?.toDate?.()?.getTime() || 0;
+                        return dateB - dateA;
+                    });
+
+                    setResumes(resumeList);
+                    setLoading(false);
+                },
+                (error) => {
+                    console.error("Error loading resumes:", error);
+                    setLoading(false);
+                    Alert.alert("Error", "Could not load your resumes.");
+                }
+            );
+
+            return unsubscribe;
+        }, []);
+
+
+        const handleView = async (resume) => {
+            if (!resume.downloadURL) {
+                Alert.alert(
+                    "File unavailable",
+                    "There is no download link for this resume."
+                );
+                return;
+            }
+
+            try {
+                await Linking.openURL(resume.downloadURL);
+            } catch (error) {
+                console.error("Error opening resume:", error);
+                Alert.alert("Error", "Could not open this resume.");
+            }
+        };
+
+        const handleDelete = (resume) => {
+            Alert.alert(
+                "Delete Resume",
+                `Remove "${resume.fileName || resume.name}" from your resumes?`,
+                [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: async () => {
+                            try {
+                                const user = auth.currentUser;
+
+                                if (!user) {
+                                    Alert.alert("Error", "Please log in again.");
+                                    return;
+                                }
+
+                                //deletes the file from Firebase Storage.
+                                if (resume.storagePath) {
+                                    try {
+                                        await deleteObject(
+                                            ref(storage, resume.storagePath)
+                                        );
+                                    } catch (storageError) {
+                                        if (
+                                            storageError.code !==
+                                            "storage/object-not-found"
+                                        ) {
+                                            throw storageError;
+                                        }
+                                    }
+                                }
+
+                                //delete the resume details from Firestore.
+                                await deleteDoc(
+                                    doc(
+                                        db,
+                                        "users",
+                                        user.uid,
+                                        "resumes",
+                                        resume.id
+                                    )
+                                );
+                            } catch (error) {
+                                console.error("Error deleting resume:", error);
+                                Alert.alert(
+                                    "Error",
+                                    "Could not delete the resume. Please try again."
+                                );
+                            }
+                        },
+                    },
+                ]
+            );
+        };
 
     return (
         <SafeAreaProvider>
@@ -45,7 +145,7 @@ const Resumes = () => {
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <ScreenHeader
                         title="My Resumes"
-                        subtitle={`${MOCK_RESUMES.length} FILE${MOCK_RESUMES.length === 1 ? '' : 'S'} UPLOADED`}
+                        subtitle={`${resumes.length} FILE${resumes.length === 1 ? "" : "S"} UPLOADED`}
                         bg={colors.lightBlueTint}
                         subtitleColor={colors.accentBlue}
                     />
@@ -57,20 +157,42 @@ const Resumes = () => {
                             body="Tip: review your resume and get feedback and improvement suggestions."
                             onPress={() => router.push('/resume-analyzer')}
                         />
+                        {loading && (<Text style={{ color: colors.textMuted, marginBottom: spacing.md }}>
+                        Loading resumes...</Text>)}
 
-                        {MOCK_RESUMES.map((resume) => (
+                        {resumes.map((resume) => (
                             <View key={resume.id} style={styles.resumeCard}>
                                 <View style={styles.cardHeaderRow}>
                                     <View style={styles.fileIconChip}>
                                         <Ionicons name="document-text" size={18} color={colors.accentBlue} />
                                     </View>
                                     <View style={styles.fileTextBlock}>
-                                        <Text style={styles.fileName}>{resume.fileName}</Text>
+                                        <Text style={styles.fileName}>
+                                            {resume.fileName || resume.name || "Resume"}
+                                        </Text>
+
                                         <Text style={styles.fileMeta}>
-                                            {resume.sizeLabel} • {resume.updatedLabel}
+                                            {resume.size
+                                                ? `${(resume.size / (1024 * 1024)).toFixed(1)} MB`
+                                                : "File size unavailable"}
+                                            {" • "}
+                                            {resume.updatedAt?.toDate
+                                                ? `Updated ${resume.updatedAt.toDate().toLocaleDateString()}`
+                                                : "Recently uploaded"}
                                         </Text>
                                     </View>
                                     <View style={styles.actions}>
+                                        <TouchableOpacity
+                                            style={styles.viewButton}
+                                            activeOpacity={0.7}
+                                            onPress={() => handleView(resume)}
+                                        >
+                                            <Ionicons
+                                                name="eye-outline"
+                                                size={14}
+                                                color={colors.accentBlue}
+                                            />
+                                        </TouchableOpacity>
                                         <TouchableOpacity
                                             style={styles.editButton}
                                             activeOpacity={0.7}
@@ -174,6 +296,14 @@ const styles = StyleSheet.create({
         backgroundColor: colors.lightBlueTint,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    viewButton: {
+        width: 28,
+        height: 28,
+        borderRadius: radius.sm,
+        backgroundColor: colors.lightBlueTint,
+        alignItems: "center",
+        justifyContent: "center",
     },
     deleteButton: {
         width: 28,
