@@ -1,382 +1,165 @@
-
-import {StyleSheet,Text,View,TextInput,TouchableOpacity,ScrollView,Alert,} from "react-native";
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import {
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../components/ScreenHeader";
-import {EmailAuthProvider,reauthenticateWithCredential,updatePassword,} from "firebase/auth";
+import { useRouter } from "expo-router";
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { auth } from "../firebase/firebase";
+import { useAppTheme } from "../theme/ThemeContext";
+import { spacing, radius } from "../theme/colors";
 
-const ChangePassword = () => {
+export default function ChangePassword() {
     const router = useRouter();
-
+    const { colors } = useAppTheme();
+    const styles = createStyles(colors);
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+    const [showCurrent, setShowCurrent] = useState(false);
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [saving, setSaving] = useState(false);
 
     const handleChangePassword = async () => {
         const user = auth.currentUser;
-
-        if (!user) {
-            Alert.alert("Error", "Please log in first.");
+        if (!user || !user.email) {
+            Alert.alert("Unable to change password", "Please sign in again with your email and password.");
             return;
         }
-
-        if (!user.email) {
-            Alert.alert(
-                "Error",
-                "Your account does not have an email address."
-            );
-            return;
-        }
-
         if (!currentPassword || !newPassword || !confirmPassword) {
-            Alert.alert(
-                "Missing information",
-                "Please complete all password fields."
-            );
+            Alert.alert("Missing information", "Please complete all password fields.");
             return;
         }
-
         if (newPassword.length < 6) {
-            Alert.alert(
-                "Invalid password",
-                "Your new password must be at least 6 characters long."
-            );
+            Alert.alert("Password too short", "Your new password must contain at least 6 characters.");
             return;
         }
-
         if (newPassword !== confirmPassword) {
-            Alert.alert(
-                "Password mismatch",
-                "The new passwords do not match."
-            );
+            Alert.alert("Passwords don't match", "Please make sure the new passwords match.");
             return;
         }
-
-        if (currentPassword === newPassword) {
-            Alert.alert(
-                "Invalid password",
-                "Your new password must be different from your current password."
-            );
+        if (newPassword === currentPassword) {
+            Alert.alert("Choose a new password", "Your new password must be different from your current password.");
             return;
         }
 
         setSaving(true);
-
         try {
-            const credential = EmailAuthProvider.credential(
-                user.email,
-                currentPassword
-            );
-
+            const credential = EmailAuthProvider.credential(user.email, currentPassword);
             await reauthenticateWithCredential(user, credential);
             await updatePassword(user, newPassword);
-
-            Alert.alert(
-                "Success",
-                "Your password has been changed.",
-                [
-                    {
-                        text: "OK",
-                        onPress: () => router.back(),
-                    },
-                ]
-            );
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+            Alert.alert("Password updated", "Your password has been changed successfully.", [
+                { text: "OK", onPress: () => router.back() },
+            ]);
         } catch (error) {
-            console.error("Error changing password:", error);
-
-            if (
-                error.code === "auth/invalid-credential" ||
-                error.code === "auth/wrong-password" ||
-                error.code === "auth/invalid-login-credentials"
-            ) {
-                Alert.alert(
-                    "Incorrect password",
-                    "Your current password is incorrect. Please try again."
-                );
+            console.error("Password update error:", error);
+            if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
+                Alert.alert("Incorrect current password", "Please check your current password and try again.");
             } else if (error.code === "auth/weak-password") {
-                Alert.alert(
-                    "Weak password",
-                    "Please choose a stronger password."
-                );
+                Alert.alert("Password too weak", "Please choose a stronger password with at least 6 characters.");
             } else if (error.code === "auth/requires-recent-login") {
-                Alert.alert(
-                    "Please log in again",
-                    "For security reasons, please log in again before changing your password."
-                );
+                Alert.alert("Please sign in again", "For your security, sign out and sign in again before changing your password.");
             } else {
-                Alert.alert(
-                    "Error",
-                    "Could not change your password. Please try again."
-                );
+                Alert.alert("Update failed", "We couldn't change your password. Please try again.");
             }
         } finally {
             setSaving(false);
         }
     };
 
-    const renderPasswordField = (label,
-        placeholder,
-        value,
-        onChangeText,
-        visible,
-        toggleVisible
-    ) => (
+    const renderPasswordField = (label, value, onChangeText, visible, setVisible, placeholder, autoComplete) => (
         <>
             <Text style={styles.label}>{label}</Text>
-
-            <View style={styles.passwordInputWrapper}>
+            <View style={styles.inputRow}>
                 <TextInput
-                    style={styles.passwordInput}
-                    placeholder={placeholder}
-                    placeholderTextColor={colors.textMuted}
+                    style={styles.input}
                     value={value}
                     onChangeText={onChangeText}
+                    placeholder={placeholder}
+                    placeholderTextColor={colors.textMuted}
                     secureTextEntry={!visible}
                     autoCapitalize="none"
                     autoCorrect={false}
+                    autoComplete={autoComplete}
                     editable={!saving}
                 />
-
-                <TouchableOpacity
-                    style={styles.eyeButton}
-                    onPress={() => toggleVisible(!visible)}
-                    activeOpacity={0.7}
-                    accessibilityLabel={
-                        visible ? "Hide password" : "Show password"
-                    }
-                >
-                    <Ionicons
-                        name={visible ? "eye-off-outline" : "eye-outline"}
-                        size={20}
-                        color={colors.textSecondary}
-                    />
+                <TouchableOpacity style={styles.eyeButton} onPress={() => setVisible(!visible)} accessibilityLabel={visible ? "Hide password" : "Show password"}>
+                    <Ionicons name={visible ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textMuted} />
                 </TouchableOpacity>
             </View>
         </>
     );
 
     return (
-        <SafeAreaProvider>
-            <SafeAreaView style={styles.safeArea} edges={["top"]}>
-                <ScrollView
-                    style={styles.scroll}
-                    contentContainerStyle={styles.scrollContent}
-                    keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
-                >
-                    <ScreenHeader
-                        title="Change Password"
-                        subtitle="ACCOUNT SECURITY"
-                        bg={colors.lightBlueTint}
-                        subtitleColor={colors.accentBlue}
-                    />
-
-                    <View style={styles.body}>
-                        <View style={styles.intro}>
-                            <View style={styles.iconCircle}>
-                                <Ionicons
-                                    name="shield-checkmark-outline"
-                                    size={28}
-                                    color={colors.navy}
-                                />
-                            </View>
-
-                            <Text style={styles.heading}>
-                                Keep Your Account Secure
-                            </Text>
-
-                            <Text style={styles.description}>
-                                Choose a strong password to help protect your
-                                Portfor U account.
-                            </Text>
-                        </View>
-
-                        {renderPasswordField(
-                            "Current Password",
-                            "Enter your current password",
-                            currentPassword,
-                            setCurrentPassword,
-                            showCurrentPassword,
-                            setShowCurrentPassword
-                        )}
-
-                        {renderPasswordField(
-                            "New Password",
-                            "Enter your new password",
-                            newPassword,
-                            setNewPassword,
-                            showNewPassword,
-                            setShowNewPassword
-                        )}
-
-                        {renderPasswordField(
-                            "Confirm New Password",
-                            "Re-enter your new password",
-                            confirmPassword,
-                            setConfirmPassword,
-                            showConfirmPassword,
-                            setShowConfirmPassword
-                        )}
-
-                        <View style={styles.passwordTip}>
-                            <Ionicons
-                                name="information-circle-outline"
-                                size={18}
-                                color={colors.accentBlue}
-                            />
-                            <Text style={styles.passwordTipText}>
-                                Use at least 6 characters. Make sure your new
-                                password matches the confirmation field.
-                            </Text>
-                        </View>
-
-                        <TouchableOpacity
-                            style={[
-                                styles.saveButton,
-                                saving && styles.disabledButton,
-                            ]}
-                            activeOpacity={0.85}
-                            onPress={handleChangePassword}
-                            disabled={saving}
-                        >
-                            <Text style={styles.saveButtonText}>
-                                {saving ? "Updating..." : "Update Password"}
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.cancelButton}
-                            activeOpacity={0.7}
-                            onPress={() => router.back()}
-                            disabled={saving}
-                        >
-                            <Text style={styles.cancelButtonText}>
-                                Cancel
-                            </Text>
-                        </TouchableOpacity>
+        <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+            <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton} accessibilityLabel="Go back">
+                        <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Change Password</Text>
+                    <View style={styles.headerSpacer} />
+                </View>
+                <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                    <View style={styles.introIcon}>
+                        <Ionicons name="shield-checkmark-outline" size={30} color={colors.navy} />
                     </View>
+                    <Text style={styles.title}>Keep your account secure</Text>
+                    <Text style={styles.subtitle}>Enter your current password, then choose a new one.</Text>
+
+                    <View style={styles.formCard}>
+                        {renderPasswordField("Current password", currentPassword, setCurrentPassword, showCurrent, setShowCurrent, "Enter current password", "current-password")}
+                        {renderPasswordField("New password", newPassword, setNewPassword, showNew, setShowNew, "At least 6 characters", "new-password")}
+                        {renderPasswordField("Confirm new password", confirmPassword, setConfirmPassword, showConfirm, setShowConfirm, "Re-enter new password", "new-password")}
+                        <View style={styles.passwordHint}>
+                            <Ionicons name="information-circle-outline" size={17} color={colors.accentBlue} />
+                            <Text style={styles.hintText}>Use at least 6 characters and avoid reusing your old password.</Text>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity style={[styles.saveButton, saving && styles.disabledButton]} onPress={handleChangePassword} disabled={saving} activeOpacity={0.85}>
+                        {saving ? <ActivityIndicator color="#FFFFFF" /> : <Ionicons name="lock-closed-outline" size={18} color="#FFFFFF" />}
+                        <Text style={styles.saveButtonText}>{saving ? "Updating..." : "Update Password"}</Text>
+                    </TouchableOpacity>
                 </ScrollView>
-            </SafeAreaView>
-        </SafeAreaProvider>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
-};
+}
 
-export default ChangePassword;
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    scroll: {
-        flex: 1,
-    },
-    scrollContent: {
-        paddingBottom: spacing.lg,
-    },
-    body: {
-        paddingHorizontal: spacing.lg,
-        paddingTop: spacing.lg,
-    },
-    intro: {
-        alignItems: "center",
-        marginBottom: spacing.xl,
-    },
-    iconCircle: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: colors.lightBlueTint,
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: spacing.md,
-    },
-    heading: {
-        fontSize: 18,
-        fontWeight: "800",
-        color: colors.textPrimary,
-        textAlign: "center",
-        marginBottom: spacing.xs,
-    },
-    description: {
-        fontSize: 14,
-        lineHeight: 21,
-        color: colors.textSecondary,
-        textAlign: "center",
-    },
-    label: {
-        fontSize: 13,
-        fontWeight: "600",
-        color: colors.textPrimary,
-        marginBottom: spacing.xs,
-    },
-    passwordInputWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.surface,
-        borderRadius: radius.md,
-        marginBottom: spacing.md,
-    },
-    passwordInput: {
-        flex: 1,
-        paddingHorizontal: spacing.md,
-        paddingVertical: 12,
-        fontSize: 14,
-        color: colors.textPrimary,
-    },
-    eyeButton: {
-        paddingHorizontal: spacing.md,
-        paddingVertical: 12,
-    },
-    passwordTip: {
-        flexDirection: "row",
-        alignItems: "flex-start",
-        gap: spacing.sm,
-        backgroundColor: colors.lightBlueTint,
-        borderRadius: radius.md,
-        padding: spacing.md,
-        marginTop: spacing.xs,
-        marginBottom: spacing.lg,
-    },
-    passwordTipText: {
-        flex: 1,
-        fontSize: 12,
-        lineHeight: 18,
-        color: colors.textSecondary,
-    },
-    saveButton: {
-        backgroundColor: colors.navy,
-        borderRadius: radius.md,
-        paddingVertical: 14,
-        alignItems: "center",
-    },
-    disabledButton: {
-        opacity: 0.6,
-    },
-    saveButtonText: {
-        color: colors.white,
-        fontSize: 15,
-        fontWeight: "700",
-    },
-    cancelButton: {
-        alignItems: "center",
-        paddingVertical: spacing.md,
-    },
-    cancelButtonText: {
-        color: colors.textSecondary,
-        fontSize: 14,
-        fontWeight: "600",
-    },
+const createStyles = (colors) => StyleSheet.create({
+    flex: { flex: 1 },
+    safeArea: { flex: 1, backgroundColor: colors.background },
+    header: { minHeight: 56, flexDirection: "row", alignItems: "center", paddingHorizontal: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border },
+    backButton: { width: 40, height: 40, justifyContent: "center" },
+    headerTitle: { flex: 1, textAlign: "center", fontSize: 18, fontWeight: "800", color: colors.textPrimary },
+    headerSpacer: { width: 40 },
+    content: { padding: spacing.lg, paddingBottom: spacing.xl },
+    introIcon: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center", backgroundColor: colors.lightBlueTint, alignSelf: "center", marginBottom: spacing.md },
+    title: { fontSize: 21, fontWeight: "800", color: colors.textPrimary, textAlign: "center" },
+    subtitle: { color: colors.textMuted, fontSize: 14, lineHeight: 20, textAlign: "center", marginTop: 6, marginBottom: spacing.lg },
+    formCard: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md },
+    label: { fontSize: 13, fontWeight: "700", color: colors.textPrimary, marginTop: spacing.sm, marginBottom: 7 },
+    inputRow: { minHeight: 48, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, backgroundColor: colors.background },
+    input: { flex: 1, minHeight: 46, paddingHorizontal: 13, fontSize: 15, color: colors.textPrimary },
+    eyeButton: { minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" },
+    passwordHint: { flexDirection: "row", alignItems: "flex-start", gap: 7, marginTop: spacing.md, padding: spacing.sm, borderRadius: radius.md, backgroundColor: colors.lightBlueTint },
+    hintText: { flex: 1, fontSize: 12, lineHeight: 18, color: colors.textSecondary },
+    saveButton: { marginTop: spacing.lg, minHeight: 50, borderRadius: radius.md, backgroundColor: colors.navy, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 9 },
+    disabledButton: { opacity: 0.6 },
+    saveButtonText: { color: "#FFFFFF", fontSize: 15, fontWeight: "800" },
 });
