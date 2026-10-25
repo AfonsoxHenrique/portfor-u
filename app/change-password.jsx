@@ -1,4 +1,3 @@
-
 import {StyleSheet,Text,View,TextInput,TouchableOpacity,ScrollView,Alert,} from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
