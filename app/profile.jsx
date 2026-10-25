@@ -6,20 +6,63 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import SectionGroup from "../components/SectionGroup";
 import SettingsRow from "../components/SettingsRow";
 import BottomTabBar from "../components/BottomTabBar";
-
-// Replace with firebase data.
-const MOCK_USER = {
-    fullName: 'Joon Chonlatorn',
-    email: '14929@ait.nsw.edu.au',
-}
+import { useState, useEffect } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/firebase";
 
 const Profile = () => {
-    const router = useRouter()
+    const router = useRouter();
 
-    const handleLogout = () => {
-        // Auth Signout and route back to welcome
-        router.replace('/')
-    }
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                router.replace("/");
+                return;
+            }
+
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+
+                    setFullName(
+                        `${data.firstName || ""} ${data.lastName || ""}`.trim()
+                        || data.fullName
+                        || "User"
+                    );
+                } else {
+                    setFullName("User");
+                }
+
+                // Use the email from Firebase Authentication.
+                setEmail(user.email || "");
+            } catch (error) {
+                console.error("Error loading profile:", error);
+                setFullName("User");
+                setEmail(user.email || "");
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            router.replace("/");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
     return (
         <SafeAreaProvider>
@@ -27,21 +70,23 @@ const Profile = () => {
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                     <View style={styles.avatarBlock}>
                         <View style={styles.avatar} />
-                        <Text style={styles.name}>{MOCK_USER.fullName}</Text>
-                        <Text style={styles.email}>{MOCK_USER.email}</Text>
+                        <Text style={styles.name}>
+                        {loading ? "Loading..." : fullName}
+                    </Text>
+                    <Text style={styles.email}>{email}</Text>
                     </View>
 
                     <SectionGroup title="ACCOUNT SETTINGS">
                         <SettingsRow
                             icon="person-outline"
                             title="Edit Profile"
-                            onPress={() => router.push('/edit-profile')}
+                            onPress={() => router.push("/edit-profile")}
                             showDivider
                         />
                         <SettingsRow
                             icon="key-outline"
                             title="Change Password"
-                            onPress={() => router.push('/change-password')}
+                            onPress={() => router.push("/change-password")}
                         />
                     </SectionGroup>
 
@@ -52,12 +97,6 @@ const Profile = () => {
                             subtitle="Push alerts"
                             onPress={() => router.push('/notifications')}
                             showDivider
-                        />
-                        <SettingsRow
-                            icon="download-outline"
-                            title="Import Data"
-                            subtitle="PDF / JPEG"
-                            onPress={() => router.push('/import-data')}
                         />
                     </SectionGroup>
 
