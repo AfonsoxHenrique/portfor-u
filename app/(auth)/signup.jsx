@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { colors, spacing, radius } from "../theme/colors";
+import { colors, spacing, radius } from "../../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import {
@@ -17,7 +17,7 @@ import {
     sendEmailVerification,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 
 const SignUp = () => {
     const router = useRouter();
@@ -111,7 +111,6 @@ const SignUp = () => {
     };
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
@@ -202,7 +201,6 @@ const SignUp = () => {
                     </View>
                 </ScrollView>
             </SafeAreaView>
-        </SafeAreaProvider>
     );
 };
 

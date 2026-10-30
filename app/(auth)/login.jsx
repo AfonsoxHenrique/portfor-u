@@ -9,11 +9,11 @@ import {
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
+import { colors, spacing, radius } from "../../theme/colors";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/firebase";
+import { auth } from "../../firebase/firebase";
 
 const Login = () => {
     const router = useRouter();
@@ -94,7 +94,6 @@ const Login = () => {
     };
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <Text style={styles.title}>Welcome Back</Text>
 
@@ -211,7 +210,6 @@ const Login = () => {
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
-        </SafeAreaProvider>
     );
 };
 

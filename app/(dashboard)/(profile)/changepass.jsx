@@ -13,10 +13,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { updatePassword } from "firebase/auth";
-import { auth } from "../firebase/firebase";
-import { colors, spacing, radius } from "../theme/colors";
+import { auth } from "../../../firebase/firebase";
+import { colors, spacing, radius } from "../../../theme/colors";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader   from "../components/ScreenHeader"
+import ScreenHeader   from "../../../components/ScreenHeader"
 
 const ChangePassword = () => {
     const router = useRouter();

@@ -8,8 +8,8 @@ import {
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { sendEmailVerification } from "firebase/auth";
-import { auth } from "../firebase/firebase";
-import { colors, spacing, radius } from "../theme/colors";
+import { auth } from "../../firebase/firebase";
+import { colors, spacing, radius } from "../../theme/colors";
 import {
     SafeAreaProvider,
     SafeAreaView,
@@ -87,7 +87,6 @@ const VerifyEmail = () => {
     };
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <View style={styles.content}>
 
@@ -150,7 +149,6 @@ const VerifyEmail = () => {
 
                 </View>
             </SafeAreaView>
-        </SafeAreaProvider>
     );
 };
 

@@ -1,19 +1,23 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../components/ScreenHeader";
-import TipCard from "../components/TipCard";
-import FloatingActionButton from "../components/FloatingActionButton";
-import BottomTabBar from "../components/BottomTabBar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { onSnapshot, collection, doc, deleteDoc } from "firebase/firestore";
+
 import { ref, deleteObject } from "firebase/storage";
-import { auth, db, storage } from "../firebase/firebase";
+import { auth, db, storage } from "../../../firebase/firebase";
+
+import ScreenHeader from "../../../components/ScreenHeader";
+import TipCard from "../../../components/TipCard";
+import FloatingActionButton from "../../../components/FloatingActionButton";
+import { useTheme } from "../../../theme/ThemeContext";
+
 
 const Resumes = () => {
-    const router = useRouter();
+    const router = useRouter()
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
 
     const [resumes, setResumes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -140,7 +144,6 @@ const Resumes = () => {
         };
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <ScreenHeader
@@ -157,9 +160,7 @@ const Resumes = () => {
                             body="Tip: review your resume and get feedback and improvement suggestions."
                             onPress={() => router.push('/resume-analyzer')}
                         />
-                        {loading && (<Text style={{ color: colors.textMuted, marginBottom: spacing.md }}>
-                        Loading resumes...</Text>)}
-
+                        {loading && (<Text style={{ color: colors.textMuted, marginBottom: spacing.md }}> Loading resumes...</Text>)}
                         {resumes.map((resume) => (
                             <View key={resume.id} style={styles.resumeCard}>
                                 <View style={styles.cardHeaderRow}>
@@ -170,7 +171,6 @@ const Resumes = () => {
                                         <Text style={styles.fileName}>
                                             {resume.fileName || resume.name || "Resume"}
                                         </Text>
-
                                         <Text style={styles.fileMeta}>
                                             {resume.size
                                                 ? `${(resume.size / (1024 * 1024)).toFixed(1)} MB`
@@ -226,17 +226,15 @@ const Resumes = () => {
                         ))}
                     </View>
                 </ScrollView>
+
                 <FloatingActionButton onPress={() => router.push('/add-resume')} />
-                
-                <BottomTabBar activeTab="resumes" />
             </SafeAreaView>
-        </SafeAreaProvider>
     )
 }
 
 export default Resumes
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
@@ -252,7 +250,7 @@ const styles = StyleSheet.create({
         paddingTop: spacing.lg,
     },
     resumeCard: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,

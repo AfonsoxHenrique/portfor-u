@@ -1,18 +1,21 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ProgressBar from "../components/ProgressBar";
-import CredentialCard from "../components/CredentialCard";
-import BottomTabBar from "../components/BottomTabBar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
-import { doc, collection, onSnapshot } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
 
-// Replace with real user data from your auth/profile.
+import { doc, collection, onSnapshot } from "firebase/firestore";
+import { auth, db } from "../../firebase/firebase";
+
+import { useTheme } from "../../theme/ThemeContext"
+import ProgressBar from "../../components/ProgressBar";
+import CredentialCard from "../../components/CredentialCard";
+
+
 
 const Home = () => {
     const router = useRouter()
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
 
     const [userProfile, setUserProfile] = useState(null);
     const [resumeList, setResumeList] = useState([]);
@@ -139,66 +142,64 @@ const Home = () => {
     workExperienceList.length > 0,
     certificateList.length > 0,
     ];
-
     const completionPercent = Math.round(
         (completionItems.filter(Boolean).length / completionItems.length) * 100
     );
-
     const certificatesNeeded = Math.max(0, 2 - certificateList.length);
-    
+
     return (
-        <SafeAreaProvider>
-            <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-                <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                    <View style={styles.header}>
-                        <View style={styles.circleLarge} />
-                        <View style={styles.circleSmall} />
-                        <Text style={styles.dashboardLabel}>DASHBOARD</Text>
-                        <Text style={styles.greeting}>
-                            Hi, {userProfile?.firstName || auth.currentUser?.displayName?.split(" ")[0] || "there"}
+        <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+            <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+                <View style={styles.header}>
+                    <View style={styles.circleLarge} />
+                    <View style={styles.circleSmall} />
+                    <Text style={styles.dashboardLabel}>DASHBOARD</Text>
+                    <Text style={styles.greeting}>
+                        Hi, {userProfile?.firstName || auth.currentUser?.displayName?.split(" ")[0] || "there"}
+                    </Text>
+                </View>
+
+                <View style={styles.completionCard}>
+                    <View style={styles.completionHeaderRow}>
+                        <Text style={styles.completionTitle}>Profile completion</Text>
+                        <Text style={styles.completionPercent}>
+                            {completionPercent}% COMPLETE
                         </Text>
                     </View>
+                    <ProgressBar percent={completionPercent} /> 
+                    <Text style={styles.completionHint}>
+                        {certificatesNeeded > 0
+                            ? `Add ${certificatesNeeded} more certificate${certificatesNeeded === 1 ? "" : "s"} to reach your certificate goal`
+                            : "Your certificate goal has been reached. Congratulations"
+                        }
+                    </Text>
+                </View>
 
-                    <View style={styles.completionCard}>
-                        <View style={styles.completionHeaderRow}>
-                            <Text style={styles.completionTitle}>Profile completion</Text>
-                            <Text style={styles.completionPercent}>
-                                {completionPercent}% COMPLETE
-                            </Text>
-                        </View>
-                        <ProgressBar percent={completionPercent} /> 
-                        <Text style={styles.completionHint}>
-                            {certificatesNeeded > 0
-                                ? `Add ${certificatesNeeded} more certificate${certificatesNeeded === 1 ? "" : "s"} to reach your certificate goal`
-                                : "Your certificate goal has been reached. Congratulations"}
-                        </Text>
-                    </View>
+                <Text style={styles.sectionTitle}>Your Credentials</Text>
 
-                    <Text style={styles.sectionTitle}>Your Credentials</Text>
-
-                    <CredentialCard
-                        icon="document-text-outline"
-                        iconColor={colors.accentBlue}
-                        iconBg={colors.lightBlueTint}
-                        title="My Resumes"
-                        stat={`${resumeList.length} ${resumeList.length === 1 ? "file" : "files"}`}
-                        statColor={colors.accentBlue}
-                        subtitle={
+                <CredentialCard
+                    icon="document-text-outline"
+                    iconColor={colors.accentBlue}
+                    iconBg={colors.lightBlueTint}
+                    title="My Resumes"
+                    stat={`${resumeList.length} ${resumeList.length === 1 ? "file" : "files"}`}
+                    statColor={colors.accentBlue}
+                    subtitle={
                             resumeList.length > 0
                                 ? `Latest: ${resumeList[0].fileName || resumeList[0].name || "Resume"}`
                                 : "No resumes uploaded yet"
                         }
-                        onPress={() => router.push("/resume")}
-                    />
+                    onPress={() => router.push('/resume')}
+                />
 
-                    <CredentialCard
-                        icon="briefcase-outline"
-                        iconColor={colors.success}
-                        iconBg={colors.successTint}
-                        title="Work Experience"
-                        stat={`${workExperienceList.length} ${workExperienceList.length === 1 ? "entry" : "entries"}`}
-                        statColor={colors.success}
-                        subtitle={
+                <CredentialCard
+                    icon="briefcase-outline"
+                    iconColor={colors.success}
+                    iconBg={colors.successTint}
+                    title="Work Experience"
+                    stat={`${workExperienceList.length} ${workExperienceList.length === 1 ? "entry" : "entries"}`}
+                    statColor={colors.success}
+                    subtitle={
                             workExperienceList.length > 0
                                 ? workExperienceList
                                     .slice(0, 2)
@@ -206,17 +207,17 @@ const Home = () => {
                                     .join(", ")
                                 : "No work experience added yet"
                         }
-                        onPress={() => router.push("/work-experience")}
-                    />
+                    onPress={() => router.push('/work-experience')}
+                />
 
-                    <CredentialCard
-                        icon="ribbon-outline"
-                        iconColor={colors.amber}
-                        iconBg={colors.amberTint}
-                        title="Certificates"
-                        stat={`${certificateList.length} ${certificateList.length === 1 ? "earned" : "earned"}`}
-                        statColor={colors.amber}
-                        subtitle={
+                <CredentialCard
+                    icon="ribbon-outline"
+                    iconColor={colors.amber}
+                    iconBg={colors.amberTint}
+                    title="Certificates"
+                    stat={`${certificateList.length} ${certificateList.length === 1 ? "earned" : "earned"}`}
+                    statColor={colors.amber}
+                    subtitle={
                             certificateList.length > 0
                                 ? certificateList
                                     .slice(0, 2)
@@ -224,28 +225,25 @@ const Home = () => {
                                     .join(", ")
                                 : "No certificates added yet"
                         }
-                        onPress={() => router.push("/certificates")}
-                    />
+                    onPress={() => router.push('/certificates')}
+                />
 
-                    <CredentialCard
-                        icon="locate-outline"
-                        iconColor={colors.red}
-                        iconBg={colors.redTint}
-                        title="Resume Guideline"
-                        subtitle="How to make a good resume?"
-                        onPress={() => router.push('/guideline')}
-                    />
-                </ScrollView>
-
-                <BottomTabBar activeTab="home" />
-            </SafeAreaView>
-        </SafeAreaProvider>
+                <CredentialCard
+                    icon="locate-outline"
+                    iconColor={colors.red}
+                    iconBg={colors.redTint}
+                    title="Resume Guideline"
+                    subtitle="How to make a good resume?"
+                    onPress={() => router.push('/guideline')}
+                />
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
 export default Home
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
@@ -257,7 +255,7 @@ const styles = StyleSheet.create({
         paddingBottom: spacing.lg,
     },
     header: {
-        backgroundColor: colors.custom1,
+        backgroundColor: colors.homeHeader,
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.lg,
         paddingBottom: spacing.xl + spacing.md,
@@ -268,7 +266,7 @@ const styles = StyleSheet.create({
         width: 160,
         height: 160,
         borderRadius: 80,
-        backgroundColor: colors.custom10,
+        backgroundColor: '#F2E6FF',
         top: -60,
         right: -40,
     },
@@ -277,7 +275,7 @@ const styles = StyleSheet.create({
         width: 90,
         height: 90,
         borderRadius: 45,
-        backgroundColor: colors.custom4,
+        backgroundColor: '#EAFDEC',
         top: 50,
         right: 50,
     },
@@ -294,7 +292,7 @@ const styles = StyleSheet.create({
         marginTop: spacing.xs,
     },
     completionCard: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         borderRadius: radius.lg,
         padding: spacing.lg,
         marginHorizontal: spacing.lg,

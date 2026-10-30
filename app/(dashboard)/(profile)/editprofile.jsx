@@ -14,10 +14,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { updateEmail, updateProfile } from "firebase/auth";
-import { auth, db } from "../firebase/firebase";
-import { colors, spacing, radius } from "../theme/colors";
+import { auth, db } from "../../../firebase/firebase";
+import { colors, spacing, radius } from "../../../theme/colors";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader   from "../components/ScreenHeader"
+import ScreenHeader   from "../../../components/ScreenHeader"
 
 const EditProfile = () => {
     const router = useRouter();
@@ -185,7 +185,7 @@ const EditProfile = () => {
                     </TouchableOpacity>
 
                     <Text style={styles.photoAction}>Change profile photo</Text>
-                    <Text style={styles.photoHint}>PNG or JPEG Â· Max 5 MB</Text>
+                    <Text style={styles.photoHint}>PNG or JPEG · Max 5 MB</Text>
                 </View>
 
                 <View style={styles.formCard}>

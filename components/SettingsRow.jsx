@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing } from "../theme/colors";
+import { useTheme } from "../theme/ThemeContext";
 
 const SettingsRow = ({ icon, title, subtitle, onPress, danger = false, showDivider = false }) => {
+    const { colors, spacing } = useTheme()
+    const styles = createStyles(colors, spacing)
     const iconColor = danger ? colors.red : colors.navy
     const titleColor = danger ? colors.red : colors.textPrimary
 
@@ -24,7 +26,7 @@ const SettingsRow = ({ icon, title, subtitle, onPress, danger = false, showDivid
 
 export default SettingsRow
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing) => StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',

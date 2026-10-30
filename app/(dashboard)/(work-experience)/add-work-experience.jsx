@@ -1,30 +1,28 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { useState, useEffect } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { colors, spacing, radius } from "../theme/colors";
+import { useRouter } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../components/ScreenHeader";
-import {
-    addDoc,
-    collection,
-    doc,
-    getDoc,
-    updateDoc,
-    serverTimestamp,
-} from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
+
+import { addDoc, collection, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../../../firebase/firebase";
+
+import { useTheme } from "../../../theme/ThemeContext";
+import ScreenHeader from "../../../components/ScreenHeader";
+import DateField from "../../../components/DateField";
+import CheckboxRow from "../../../components/CheckboxRow";
+import SelectField from "../../../components/SelectField";
+
+const WORK_ARRANGEMENTS = ['Remote', 'Hybrid', 'On-site']
 
 const AddWorkExperience = () => {
     const router = useRouter()
-    const { id } = useLocalSearchParams()
-    const isEditing = !!id
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
 
-    const [jobTitle, setJobTitle] = useState('')
-    const [company, setCompany] = useState('')
-    const [location, setLocation] = useState('')
-    const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
     const [description, setDescription] = useState('')
+
+   
 
     const [saving, setSaving] = useState(false);
 
@@ -138,17 +136,17 @@ const AddWorkExperience = () => {
 
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={styles.safeArea} edges={['top']}>
+            <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
                     <ScreenHeader
-                        title={isEditing ? 'Edit Experience' : 'Add Work Experience'}
-                        subtitle={isEditing ? 'UPDATE ENTRY' : 'NEW ENTRY'}
+                        title={isEditing ? 'Edit Work Experience' : 'Add Work Experience'}
+                        subtitle={isEditing ? 'UPDATE YOUR EXPERIENCE' : 'BUILD YOUR WORK HISTORY'}
                         bg={colors.successTint}
                         subtitleColor={colors.success}
                     />
 
                     <View style={styles.body}>
-                        <Text style={styles.label}>Job Title</Text>
+                        <Text style={styles.label}>Job title</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="e.g. Software Engineering Intern"
@@ -166,42 +164,54 @@ const AddWorkExperience = () => {
                             onChangeText={setCompany}
                         />
 
-                        <Text style={styles.label}>Location</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="e.g. San Francisco, CA (Remote)"
-                            placeholderTextColor={colors.textMuted}
-                            value={location}
-                            onChangeText={setLocation}
+                        <View style={styles.row}>
+                            <DateField
+                                label="Start date"
+                                placeholder="Month, year"
+                                value={startDate}
+                                onChangeText={setStartDate}
+                                style={styles.rowField}
+                            />
+                            <DateField
+                                label="End date"
+                                placeholder="Month, year"
+                                value={endDate}
+                                onChangeText={setEndDate}
+                                style={styles.rowField}
+                            />
+                        </View>
+
+                        <CheckboxRow
+                            label="I currently work here"
+                            checked={currentlyWorkHere}
+                            onToggle={() => setCurrentlyWorkHere((prev) => !prev)}
                         />
 
-                        <View style={styles.dateRow}>
-                            <View style={styles.dateField}>
-                                <Text style={styles.label}>Start Date</Text>
+                        <View style={styles.row}>
+                            <View style={styles.rowField}>
+                                <Text style={styles.label}>Location</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="e.g. Jun 2025"
+                                    placeholder="City, state"
                                     placeholderTextColor={colors.textMuted}
-                                    value={startDate}
-                                    onChangeText={setStartDate}
+                                    value={location}
+                                    onChangeText={setLocation}
                                 />
                             </View>
-                            <View style={styles.dateField}>
-                                <Text style={styles.label}>End Date</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="e.g. Aug 2025"
-                                    placeholderTextColor={colors.textMuted}
-                                    value={endDate}
-                                    onChangeText={setEndDate}
-                                />
-                            </View>
+                            <SelectField
+                                label="Work arrangement"
+                                placeholder="Select"
+                                value={workArrangement}
+                                options={WORK_ARRANGEMENTS}
+                                onSelect={setWorkArrangement}
+                                style={styles.rowField}
+                            />
                         </View>
 
                         <Text style={styles.label}>Description</Text>
                         <TextInput
                             style={[styles.input, styles.textArea]}
-                            placeholder="What did you work on? Mention tools, impact, and results."
+                            placeholder="Describe your responsibilities and key achievements..."
                             placeholderTextColor={colors.textMuted}
                             value={description}
                             onChangeText={setDescription}
@@ -210,24 +220,17 @@ const AddWorkExperience = () => {
                             textAlignVertical="top"
                         />
 
-                        <TouchableOpacity
-                            style={styles.saveButton}
-                            activeOpacity={0.85}
-                            onPress={handleSave}
-                            disabled={saving}
-                        >
+                        <TouchableOpacity style={styles.saveButton} activeOpacity={0.85} onPress={handleSave} disabled={saving}>
                             <Text style={styles.saveButtonText}>
-                                {saving
-                                    ? "Saving..."
-                                    : isEditing
-                                        ? "Save Changes"
-                                        : "Save Experience"}
+                                {saving ? 'Save...' : isEditing ? "Save Changes" : "Save Experience"}
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.cancelButton} activeOpacity={0.7} onPress={() => router.back()}>
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
-                        </TouchableOpacity>
+                        {isEditing && (
+                            <TouchableOpacity style={styles.deleteButton} activeOpacity={0.7} onPress={handleDelete}>
+                                <Text style={styles.deleteButtonText}>Delete experience</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -237,7 +240,7 @@ const AddWorkExperience = () => {
 
 export default AddWorkExperience
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
@@ -273,12 +276,13 @@ const styles = StyleSheet.create({
         minHeight: 110,
         paddingTop: 12,
     },
-    dateRow: {
+    row: {
         flexDirection: 'row',
         gap: spacing.md,
     },
-    dateField: {
+    rowField: {
         flex: 1,
+        marginBottom: spacing.md,
     },
     saveButton: {
         backgroundColor: colors.navy,
@@ -292,13 +296,16 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '700',
     },
-    cancelButton: {
+    deleteButton: {
+        backgroundColor: colors.redTint,
+        borderRadius: radius.md,
+        paddingVertical: 14,
         alignItems: 'center',
-        paddingVertical: spacing.md,
+        marginTop: spacing.sm,
     },
-    cancelButtonText: {
-        color: colors.textSecondary,
+    deleteButtonText: {
+        color: colors.red,
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '700',
     },
 })

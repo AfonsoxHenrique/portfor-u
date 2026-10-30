@@ -1,17 +1,27 @@
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar"
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider, useTheme } from "../theme/ThemeContext";
 
-const RootLayout = () => {
-    return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="welcome"/>
-            <Stack.Screen name="login"/>
-            <Stack.Screen name="signup"/>
-            <Stack.Screen name="home" />
-            <Stack.Screen name="resume"/>
-            <Stack.Screen name="profile"/>
-            
-        </Stack>
-    )
+const AppShell = () => {
+  const { isDark } = useTheme();
+  return (
+    <>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(dashboard)" />
+      </Stack>
+    </>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppShell />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
 }
-
-export default RootLayout

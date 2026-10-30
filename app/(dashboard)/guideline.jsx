@@ -9,46 +9,40 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { spacing } from "../theme/colors";
-import ScreenHeader from "../components/ScreenHeader";
-import BottomTabBar from "../components/BottomTabBar";
+import { useTheme } from "../../theme/ThemeContext";
+import ScreenHeader from "../../components/ScreenHeader";
 
 const sections = [
      {
         number:"01",
         title:"Clear Formatting",
         icon:"grid-outline",
-        color:"#3B82F6",
         body:"Use a simple, clean layout with readable sans-serif fonts.",
     },
     {
         number:"02",
         title:"Quantify Achievements",
         icon:"trending-up-outline",
-        color:"#10B981",
         body:"Include metrics (e.g.'Boosted user retention bu 24%')",
     },
     {
         number:"03",
         title:"Tailor to the Job",
         icon:"radio-button-on-outline",
-        color:"#EF4444",
         body:"Align your experice with keywords from the job post.",
     },
     {
         number:"04",
         title:"Keep it Concise(1-2 pages)",
         icon:"document-text-outline",
-        color:"#A05DF2",
         body:"Focus heavily on recent, relevant projects and roles.",
     },
     {
         number:"05",
         title:"Use Action Verbs",
         icon:"flash-outline",
-        color:"#F0D601",
         body:"Start points with powerful words like Lead, Design, Devise.",
-    },  
+    },
 ];
 
 const checklist = [
@@ -79,6 +73,7 @@ const resources = [
 ];
 
 export default function Guidelines() {
+    const { colors } = useTheme()
     const [checkedItems, setCheckedItems] = useState([]);
 
     const toggleChecklistItem = (item) => {
@@ -113,22 +108,22 @@ export default function Guidelines() {
         <SafeAreaView
             style={{
                 flex: 1,
-                backgroundColor: "#F7F9FC",
+                backgroundColor: colors.background,
             }}
             edges={['top', 'bottom']}
         >
             <View style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={{
-                        paddingBottom: spacing.lg,
+                        paddingBottom: 24,
                     }}
                     showsVerticalScrollIndicator={false}
                 >
                     <ScreenHeader
                         title="Resume Guideline"
                         subtitle="HOW TO WRITE A STRONG RESUME"
-                        bg="#FDF2F8"
-                        subtitleColor="#EF4444"
+                        bg={colors.redTint}
+                        subtitleColor={colors.red}
                     />
 
                     {/* Introduction */}
@@ -140,9 +135,9 @@ export default function Guidelines() {
                             padding: 16,
                             flexDirection: "row",
                             alignItems: "flex-start",
-                            backgroundColor: "#FFFFFF",
+                            backgroundColor: colors.surface,
                             borderWidth: 1,
-                            borderColor: "#E5EAF2",
+                            borderColor: colors.border,
                             borderRadius: 16,
                         }}
                     >
@@ -151,7 +146,7 @@ export default function Guidelines() {
                                 width: 40,
                                 height: 40,
                                 borderRadius: 12,
-                                backgroundColor: "#FDF2F8",
+                                backgroundColor: colors.redTint,
                                 alignItems: "center",
                                 justifyContent: "center",
                                 marginRight: 12,
@@ -160,14 +155,14 @@ export default function Guidelines() {
                             <Ionicons
                                 name="bulb-outline"
                                 size={22}
-                                color="#EF4444"
+                                color={colors.red}
                             />
                         </View>
 
                         <View style={{ flex: 1 }}>
                             <Text
                                 style={{
-                                    color: "#1F2937",
+                                    color: colors.textPrimary,
                                     fontSize: 14,
                                     fontWeight: "800",
                                     marginBottom: 5,
@@ -178,7 +173,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#64748B",
+                                    color: colors.textSecondary,
                                     fontSize: 12,
                                     lineHeight: 19,
                                 }}
@@ -208,7 +203,7 @@ export default function Guidelines() {
                         >
                             <Text
                                 style={{
-                                    color: "#1F2937",
+                                    color: colors.textPrimary,
                                     fontSize: 18,
                                     fontWeight: "800",
                                 }}
@@ -218,7 +213,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#3B82F6",
+                                    color: colors.accentBlue,
                                     fontSize: 10,
                                     fontWeight: "800",
                                 }}
@@ -233,10 +228,10 @@ export default function Guidelines() {
                                 style={{
                                     flexDirection: "row",
                                     alignItems: "flex-start",
-                                    backgroundColor: "#FFFFFF",
+                                    backgroundColor: colors.surface,
                                     borderRadius: 16,
                                     borderWidth: 1,
-                                    borderColor: "#E5EAF2",
+                                    borderColor: colors.border,
                                     padding: 14,
                                     marginBottom: 12,
                                 }}
@@ -246,7 +241,7 @@ export default function Guidelines() {
                                         width: 40,
                                         height: 40,
                                         borderRadius: 12,
-                                        backgroundColor: "#FDF2F8",
+                                        backgroundColor: colors.redTint,
                                         alignItems: "center",
                                         justifyContent: "center",
                                         marginRight: 12,
@@ -255,7 +250,7 @@ export default function Guidelines() {
                                     <Ionicons
                                         name={section.icon}
                                         size={20}
-                                        color="#EF4444"
+                                        color={colors.red}
                                     />
                                 </View>
 
@@ -269,7 +264,7 @@ export default function Guidelines() {
                                     >
                                         <Text
                                             style={{
-                                                color: "#3B82F6",
+                                                color: colors.accentBlue,
                                                 fontSize: 11,
                                                 fontWeight: "800",
                                                 marginRight: 8,
@@ -281,7 +276,7 @@ export default function Guidelines() {
                                         <Text
                                             style={{
                                                 flex: 1,
-                                                color: "#1F2937",
+                                                color: colors.textPrimary,
                                                 fontSize: 14,
                                                 fontWeight: "800",
                                             }}
@@ -292,7 +287,7 @@ export default function Guidelines() {
 
                                     <Text
                                         style={{
-                                            color: "#64748B",
+                                            color: colors.textSecondary,
                                             fontSize: 12,
                                             lineHeight: 19,
                                         }}
@@ -313,7 +308,7 @@ export default function Guidelines() {
                     >
                         <Text
                             style={{
-                                color: "#1F2937",
+                                color: colors.textPrimary,
                                 fontSize: 18,
                                 fontWeight: "800",
                                 marginBottom: 6,
@@ -324,10 +319,10 @@ export default function Guidelines() {
 
                         <View
                             style={{
-                                backgroundColor: "#FFFFFF",
+                                backgroundColor: colors.surface,
                                 borderRadius: 20,
                                 borderWidth: 1,
-                                borderColor: "#E5EAF2",
+                                borderColor: colors.border,
                                 padding: 20,
                                 shadowColor: "#000000",
                                 shadowOffset: {
@@ -347,7 +342,7 @@ export default function Guidelines() {
                             >
                                 <Text
                                     style={{
-                                        color: "#1F2937",
+                                        color: colors.textPrimary,
                                         fontSize: 18,
                                         fontWeight: "800",
                                     }}
@@ -357,7 +352,7 @@ export default function Guidelines() {
 
                                 <Text
                                     style={{
-                                        color: "#3B82F6",
+                                        color: colors.accentBlue,
                                         fontSize: 10,
                                         fontWeight: "700",
                                         letterSpacing: 0.5,
@@ -369,7 +364,7 @@ export default function Guidelines() {
 
                                 <Text
                                     style={{
-                                        color: "#64748B",
+                                        color: colors.textSecondary,
                                         fontSize: 10,
                                         marginTop: 5,
                                     }}
@@ -381,14 +376,14 @@ export default function Guidelines() {
                             <View
                                 style={{
                                     height: 1,
-                                    backgroundColor: "#E5EAF2",
+                                    backgroundColor: colors.border,
                                     marginBottom: 16,
                                 }}
                             />
 
                             <Text
                                 style={{
-                                    color: "#1E3A8A",
+                                    color: colors.navy,
                                     fontSize: 11,
                                     fontWeight: "800",
                                     marginBottom: 8,
@@ -399,7 +394,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#64748B",
+                                    color: colors.textSecondary,
                                     fontSize: 11,
                                     lineHeight: 17,
                                     marginBottom: 16,
@@ -413,7 +408,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#1E3A8A",
+                                    color: colors.navy,
                                     fontSize: 11,
                                     fontWeight: "800",
                                     marginBottom: 8,
@@ -424,7 +419,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#1F2937",
+                                    color: colors.textPrimary,
                                     fontSize: 12,
                                     fontWeight: "700",
                                     marginBottom: 4,
@@ -435,7 +430,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#64748B",
+                                    color: colors.textSecondary,
                                     fontSize: 10,
                                     marginBottom: 8,
                                 }}
@@ -452,7 +447,7 @@ export default function Guidelines() {
                             >
                                 <Text
                                     style={{
-                                        color: "#64748B",
+                                        color: colors.textSecondary,
                                         marginRight: 6,
                                         fontSize: 11,
                                     }}
@@ -462,7 +457,7 @@ export default function Guidelines() {
                                 <Text
                                     style={{
                                         flex: 1,
-                                        color: "#64748B",
+                                        color: colors.textSecondary,
                                         fontSize: 11,
                                         lineHeight: 16,
                                     }}
@@ -481,7 +476,7 @@ export default function Guidelines() {
                             >
                                 <Text
                                     style={{
-                                        color: "#64748B",
+                                        color: colors.textSecondary,
                                         marginRight: 6,
                                         fontSize: 11,
                                     }}
@@ -491,7 +486,7 @@ export default function Guidelines() {
                                 <Text
                                     style={{
                                         flex: 1,
-                                        color: "#64748B",
+                                        color: colors.textSecondary,
                                         fontSize: 11,
                                         lineHeight: 16,
                                     }}
@@ -503,7 +498,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#1E3A8A",
+                                    color: colors.navy,
                                     fontSize: 11,
                                     fontWeight: "800",
                                     marginBottom: 8,
@@ -514,7 +509,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#1F2937",
+                                    color: colors.textPrimary,
                                     fontSize: 12,
                                     fontWeight: "700",
                                     marginBottom: 4,
@@ -525,7 +520,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#64748B",
+                                    color: colors.textSecondary,
                                     fontSize: 10,
                                     marginBottom: 16,
                                 }}
@@ -535,7 +530,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#1E3A8A",
+                                    color: colors.navy,
                                     fontSize: 11,
                                     fontWeight: "800",
                                     marginBottom: 8,
@@ -556,7 +551,7 @@ export default function Guidelines() {
                                         <View
                                             key={skill}
                                             style={{
-                                                backgroundColor: "#EFF6FF",
+                                                backgroundColor: colors.lightBlueTint,
                                                 paddingHorizontal: 10,
                                                 paddingVertical: 5,
                                                 borderRadius: 6,
@@ -564,7 +559,7 @@ export default function Guidelines() {
                                         >
                                             <Text
                                                 style={{
-                                                    color: "#3B82F6",
+                                                    color: colors.accentBlue,
                                                     fontSize: 10,
                                                     fontWeight: "700",
                                                 }}
@@ -581,7 +576,7 @@ export default function Guidelines() {
                             onPress={handleDownload}
                             activeOpacity={0.85}
                             style={{
-                                backgroundColor: "#1E3A8A",
+                                backgroundColor: colors.navy,
                                 borderRadius: 14,
                                 paddingVertical: 15,
                                 paddingHorizontal: 16,
@@ -589,7 +584,7 @@ export default function Guidelines() {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 marginTop: 14,
-                                shadowColor: "#1E3A8A",
+                                shadowColor: colors.navy,
                                 shadowOffset: {
                                     width: 0,
                                     height: 4,
@@ -602,13 +597,13 @@ export default function Guidelines() {
                             <Ionicons
                                 name="download-outline"
                                 size={18}
-                                color="#FFFFFF"
+                                color={colors.white}
                                 style={{ marginRight: 8 }}
                             />
 
                             <Text
                                 style={{
-                                    color: "#FFFFFF",
+                                    color: colors.white,
                                     fontSize: 14,
                                     fontWeight: "800",
                                 }}
@@ -619,7 +614,7 @@ export default function Guidelines() {
 
                         <Text
                             style={{
-                                color: "#64748B",
+                                color: colors.textSecondary,
                                 fontSize: 11,
                                 lineHeight: 17,
                                 marginTop: 8,
@@ -637,9 +632,9 @@ export default function Guidelines() {
                             marginHorizontal: 20,
                             marginTop: 24,
                             marginBottom: 22,
-                            backgroundColor: "#FFFFFF",
+                            backgroundColor: colors.surface,
                             borderWidth: 1,
-                            borderColor: "#E5EAF2",
+                            borderColor: colors.border,
                             borderRadius: 18,
                             padding: 16,
                         }}
@@ -654,7 +649,7 @@ export default function Guidelines() {
                             <View style={{ flex: 1 }}>
                                 <Text
                                     style={{
-                                        color: "#1F2937",
+                                        color: colors.textPrimary,
                                         fontSize: 18,
                                         fontWeight: "800",
                                     }}
@@ -664,7 +659,7 @@ export default function Guidelines() {
 
                                 <Text
                                     style={{
-                                        color: "#64748B",
+                                        color: colors.textSecondary,
                                         fontSize: 12,
                                         marginTop: 5,
                                     }}
@@ -675,7 +670,7 @@ export default function Guidelines() {
 
                             <Text
                                 style={{
-                                    color: "#EF4444",
+                                    color: colors.red,
                                     fontSize: 14,
                                     fontWeight: "800",
                                 }}
@@ -687,7 +682,7 @@ export default function Guidelines() {
                         <View
                             style={{
                                 height: 6,
-                                backgroundColor: "#FCE7F3",
+                                backgroundColor: colors.redTint,
                                 borderRadius: 10,
                                 overflow: "hidden",
                                 marginTop: 16,
@@ -698,7 +693,7 @@ export default function Guidelines() {
                                 style={{
                                     height: "100%",
                                     width: `${progress * 100}%`,
-                                    backgroundColor: "#EF4444",
+                                    backgroundColor: colors.red,
                                     borderRadius: 10,
                                 }}
                             />
@@ -726,7 +721,7 @@ export default function Guidelines() {
                                         }
                                         size={21}
                                         color={
-                                            isChecked ? "#EF4444" : "#94A3B8"
+                                            isChecked ? colors.red : colors.textMuted
                                         }
                                     />
 
@@ -734,8 +729,8 @@ export default function Guidelines() {
                                         style={{
                                             flex: 1,
                                             color: isChecked
-                                                ? "#94A3B8"
-                                                : "#1F2937",
+                                                ? colors.textMuted
+                                                : colors.textPrimary,
                                             fontSize: 12,
                                             lineHeight: 18,
                                             marginLeft: 10,
@@ -760,7 +755,7 @@ export default function Guidelines() {
                     >
                         <Text
                             style={{
-                                color: "#1F2937",
+                                color: colors.textPrimary,
                                 fontSize: 18,
                                 fontWeight: "800",
                                 marginBottom: 6,
@@ -771,7 +766,7 @@ export default function Guidelines() {
 
                         <Text
                             style={{
-                                color: "#64748B",
+                                color: colors.textSecondary,
                                 fontSize: 12,
                                 lineHeight: 18,
                                 marginBottom: 14,
@@ -789,9 +784,9 @@ export default function Guidelines() {
                                 style={{
                                     flexDirection: "row",
                                     alignItems: "center",
-                                    backgroundColor: "#FFFFFF",
+                                    backgroundColor: colors.surface,
                                     borderWidth: 1,
-                                    borderColor: "#E5EAF2",
+                                    borderColor: colors.border,
                                     borderRadius: 14,
                                     padding: 13,
                                     marginBottom: 10,
@@ -802,7 +797,7 @@ export default function Guidelines() {
                                         width: 38,
                                         height: 38,
                                         borderRadius: 11,
-                                        backgroundColor: "#FDF2F8",
+                                        backgroundColor: colors.redTint,
                                         alignItems: "center",
                                         justifyContent: "center",
                                         marginRight: 12,
@@ -811,14 +806,14 @@ export default function Guidelines() {
                                     <Ionicons
                                         name="open-outline"
                                         size={19}
-                                        color="#EF4444"
+                                        color={colors.red}
                                     />
                                 </View>
 
                                 <View style={{ flex: 1 }}>
                                     <Text
                                         style={{
-                                            color: "#1F2937",
+                                            color: colors.textPrimary,
                                             fontSize: 13,
                                             fontWeight: "800",
                                         }}
@@ -828,7 +823,7 @@ export default function Guidelines() {
 
                                     <Text
                                         style={{
-                                            color: "#64748B",
+                                            color: colors.textSecondary,
                                             fontSize: 11,
                                             marginTop: 4,
                                         }}
@@ -840,7 +835,7 @@ export default function Guidelines() {
                                 <Ionicons
                                     name="chevron-forward"
                                     size={18}
-                                    color="#94A3B8"
+                                    color={colors.textMuted}
                                 />
                             </TouchableOpacity>
                         ))}
@@ -854,20 +849,20 @@ export default function Guidelines() {
                             marginHorizontal: 20,
                             marginBottom: 12,
                             padding: 14,
-                            backgroundColor: "#FDF2F8",
+                            backgroundColor: colors.redTint,
                             borderRadius: 14,
                         }}
                     >
                         <Ionicons
                             name="information-circle-outline"
                             size={19}
-                            color="#EF4444"
+                            color={colors.red}
                         />
 
                         <Text
                             style={{
                                 flex: 1,
-                                color: "#64748B",
+                                color: colors.textSecondary,
                                 fontSize: 11,
                                 lineHeight: 17,
                                 marginLeft: 9,
@@ -878,8 +873,6 @@ export default function Guidelines() {
                         </Text>
                     </View>
                 </ScrollView>
-
-                <BottomTabBar activeTab="guideline" />
             </View>
         </SafeAreaView>
     );
