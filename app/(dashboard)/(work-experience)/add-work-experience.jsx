@@ -1,9 +1,16 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { useState, useEffect } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-
-import { addDoc, collection, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    updateDoc,
+    deleteDoc,
+    serverTimestamp
+} from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebase";
 
 import { useTheme } from "../../../theme/ThemeContext";
@@ -15,15 +22,22 @@ import SelectField from "../../../components/SelectField";
 const WORK_ARRANGEMENTS = ['Remote', 'Hybrid', 'On-site']
 
 const AddWorkExperience = () => {
-    const router = useRouter()
-    const { colors, spacing, radius } = useTheme()
-    const styles = createStyles(colors, spacing, radius)
+    const router = useRouter();
+    const { id } = useLocalSearchParams();
+    const isEditing = !!id;
 
-    const [endDate, setEndDate] = useState('')
-    const [description, setDescription] = useState('')
+    const { colors, spacing, radius } = useTheme();
+    const styles = createStyles(colors, spacing, radius);
 
+    const [jobTitle, setJobTitle] = useState("");
+    const [company, setCompany] = useState("");
+    const [location, setLocation] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [description, setDescription] = useState("");
+    const [currentlyWorkHere, setCurrentlyWorkHere] = useState(false);
+    const [workArrangement, setWorkArrangement] = useState("");
    
-
     const [saving, setSaving] = useState(false);
 
 
@@ -58,6 +72,8 @@ const AddWorkExperience = () => {
                     setStartDate(data.startDate || "");
                     setEndDate(data.endDate || "");
                     setDescription(data.description || "");
+                    setCurrentlyWorkHere(data.currentlyWorkHere || false);
+                    setWorkArrangement(data.workArrangement || "");
                 } else {
                     Alert.alert("Error", "Experience not found.");
                 }
@@ -70,71 +86,120 @@ const AddWorkExperience = () => {
         loadExperience();
     }, [id]);
 
-    const handleSave = async () => {
-        const user = auth.currentUser;
+        const handleDelete = () => {
+        Alert.alert(
+            "Delete experience",
+            "Are you sure you want to delete this work experience?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        const user = auth.currentUser;
 
-        if (!user) {
-            Alert.alert("Error", "Please log in first.");
-            return;
-        }
+                        if (!user) {
+                            Alert.alert("Error", "Please log in first.");
+                            return;
+                        }
 
-        if (!jobTitle.trim() || !company.trim()) {
-            Alert.alert(
-                "Missing information",
-                "Please enter at least a job title and company."
-            );
-            return;
-        }
+                        try {
+                            await deleteDoc(
+                                doc(
+                                    db,
+                                    "users",
+                                    user.uid,
+                                    "workExperience",
+                                    String(id)
+                                )
+                            );
 
-        setSaving(true);
-
-        try {
-            const experienceData = {
-                jobTitle: jobTitle.trim(),
-                company: company.trim(),
-                location: location.trim(),
-                startDate: startDate.trim(),
-                endDate: endDate.trim(),
-                description: description.trim(),
-                updatedAt: serverTimestamp(),
-            };
-
-            if (isEditing) {
-                await updateDoc(
-                    doc(
-                        db,
-                        "users",
-                        user.uid,
-                        "workExperience",
-                        String(id)
-                    ),
-                    experienceData
-                );
-            } else {
-                await addDoc(
-                    collection(
-                        db,
-                        "users",
-                        user.uid,
-                        "workExperience"
-                    ),
-                    {
-                        ...experienceData,
-                        createdAt: serverTimestamp(),
-                    }
-                );
-            }
-
-            router.back();
-        } catch (error) {
-            console.error("Error saving experience:", error);
-            Alert.alert("Error", "Could not save the work experience.");
-        } finally {
-            setSaving(false);
-        }
+                            Alert.alert("Deleted", "Work experience deleted successfully.", [
+                                {
+                                    text: "OK",
+                                    onPress: () => router.back(),
+                                },
+                            ]);
+                        } catch (error) {
+                            console.error("Delete error:", error);
+                            Alert.alert("Error", "Could not delete this experience.");
+                        }
+                    },
+                },
+            ]
+        );
     };
 
-    return (
+        const handleSave = async () => {
+            const user = auth.currentUser;
+
+            if (!user) {
+                Alert.alert("Error", "Please log in first.");
+                return;
+            }
+
+            if (!jobTitle.trim() || !company.trim()) {
+                Alert.alert(
+                    "Missing information",
+                    "Please enter at least a job title and company."
+                );
+                return;
+            }
+
+            setSaving(true);
+
+            try {
+                const experienceData = {
+                    jobTitle: jobTitle.trim(),
+                    company: company.trim(),
+                    location: location.trim(),
+                    startDate: startDate.trim(),
+                    endDate: currentlyWorkHere ? "" : endDate.trim(),
+                    currentlyWorkHere,
+                    workArrangement,
+                    description: description.trim(),
+                    updatedAt: serverTimestamp(),
+                };
+
+                if (isEditing) {
+                    await updateDoc(
+                        doc(
+                            db,
+                            "users",
+                            user.uid,
+                            "workExperience",
+                            String(id)
+                        ),
+                        experienceData
+                    );
+                } else {
+                    await addDoc(
+                        collection(
+                            db,
+                            "users",
+                            user.uid,
+                            "workExperience"
+                        ),
+                        {
+                            ...experienceData,
+                            createdAt: serverTimestamp(),
+                        }
+                    );
+                }
+
+                router.back();
+            } catch (error) {
+                console.error("Error saving experience:", error);
+                Alert.alert("Error", "Could not save the work experience.");
+            } finally {
+                setSaving(false);
+            }
+        };
+
+        return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">

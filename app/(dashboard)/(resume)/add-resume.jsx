@@ -14,9 +14,16 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "../../../firebase/firebase";
 
 const AddResume = () => {
-    const router = useRouter()
-    const { colors, spacing, radius } = useTheme()
-    const styles = createStyles(colors, spacing, radius)
+    const router = useRouter();
+    const { id } = useLocalSearchParams();
+    const isEditing = !!id;
+
+    const { colors, spacing, radius } = useTheme();
+    const styles = createStyles(colors, spacing, radius);
+
+    const [title, setTitle] = useState("");
+    const [targetRole, setTargetRole] = useState("");
+    const [industry, setIndustry] = useState("");
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -184,8 +191,14 @@ const AddResume = () => {
                     <View style={styles.body}>
                         <UploadBox
                             label="Resume file"
-                            title="Choose a resume to upload"
-                            hint="PDF or DOCX - Max 10MB"
+                            title={selectedFile ? selectedFile.name : "Choose a resume to upload"}
+                            hint={
+                                selectedFile
+                                    ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`
+                                    : existingResume
+                                        ? `Current file: ${existingResume.fileName || existingResume.name}`
+                                        : "PDF or DOCX - Max 10MB"
+                            }
                             onChooseFile={handleChooseFile}
                         />
 

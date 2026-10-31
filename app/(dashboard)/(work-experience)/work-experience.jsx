@@ -135,55 +135,20 @@ const WorkExperience = () => {
                             </Text>
                         ) : (
                             experiences.map((exp) => (
-                                <View key={exp.id} style={styles.card}>
-                                    <View style={styles.cardHeader}>
-                                        <View style={styles.cardTitleBlock}>
-                                            <Text style={styles.jobTitle}>
-                                                {exp.jobTitle}
-                                            </Text>
-                                            <Text style={styles.company}>
-                                                {exp.company}
-                                            </Text>
-                                        </View>
-
-                                        <View style={styles.actionButtons}>
-                                            <TouchableOpacity
-                                                style={styles.editButton}
-                                                activeOpacity={0.7}
-                                                onPress={() => handleEdit(exp.id)}
-                                            >
-                                                <Ionicons
-                                                    name="pencil-outline"
-                                                    size={16}
-                                                    color={colors.accentBlue}
-                                                />
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity
-                                                style={styles.deleteButton}
-                                                activeOpacity={0.7}
-                                                onPress={() => handleDelete(exp.id)}
-                                            >
-                                                <Ionicons
-                                                    name="trash-outline"
-                                                    size={16}
-                                                    color={colors.red}
-                                                />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-
-                                    <Text style={styles.duration}>
-                                        {exp.startDate || "Start date not specified"}
-                                        {" - "}
-                                        {exp.endDate || "Present"}
-                                        {exp.location ? ` | ${exp.location}` : ""}
-                                    </Text>
-
-                                    <Text style={styles.description}>
-                                        {exp.description || "No description provided."}
-                                    </Text>
-                                </View>
+                                <ExperienceCard
+                                    key={exp.id}
+                                    title={exp.jobTitle}
+                                    company={exp.company}
+                                    dateRange={`${exp.startDate || "Start date not specified"} - ${
+                                        exp.currentlyWorkHere
+                                            ? "Present"
+                                            : exp.endDate || "End date not specified"
+                                    }`}
+                                    location={exp.location}
+                                    description={exp.description || "No description provided."}
+                                    onEdit={() => handleEdit(exp.id)}
+                                    onDelete={() => handleDelete(exp.id)}
+                                />
                             ))
                         )}
 
