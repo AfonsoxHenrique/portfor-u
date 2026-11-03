@@ -1,25 +1,29 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { colors, spacing, radius } from "../theme/colors";
+import { useTheme } from "../../../theme/ThemeContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../components/ScreenHeader";
-import UploadBox from "../components/UploadBox";
+import ScreenHeader from "../../../components/ScreenHeader";
+import UploadBox from "../../../components/UploadBox";
+
 import { useEffect } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { Alert } from "react-native";
 import { addDoc, collection, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, db, storage } from "../firebase/firebase";
+import { auth, db, storage } from "../../../firebase/firebase";
 
 const AddResume = () => {
-    const router = useRouter()
-    const { id } = useLocalSearchParams()
-    const isEditing = !!id
+    const router = useRouter();
+    const { id } = useLocalSearchParams();
+    const isEditing = !!id;
 
-    const [title, setTitle] = useState('')
-    const [targetRole, setTargetRole] = useState('')
-    const [industry, setIndustry] = useState('')
+    const { colors, spacing, radius } = useTheme();
+    const styles = createStyles(colors, spacing, radius);
+
+    const [title, setTitle] = useState("");
+    const [targetRole, setTargetRole] = useState("");
+    const [industry, setIndustry] = useState("");
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -27,7 +31,6 @@ const AddResume = () => {
     useEffect(() => {
         const loadResume = async () => {
             if (!id) return;
-
             const user = auth.currentUser;
 
             if (!user) {
@@ -188,21 +191,17 @@ const AddResume = () => {
                     <View style={styles.body}>
                         <UploadBox
                             label="Resume file"
-                            title="Choose a resume to upload"
-                            hint="PDF or DOCX - Max 10MB"
+                            title={selectedFile ? selectedFile.name : "Choose a resume to upload"}
+                            hint={
+                                selectedFile
+                                    ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`
+                                    : existingResume
+                                        ? `Current file: ${existingResume.fileName || existingResume.name}`
+                                        : "PDF or DOCX - Max 10MB"
+                            }
                             onChooseFile={handleChooseFile}
                         />
-                        {selectedFile && (
-                        <Text style={{ marginBottom: spacing.md, color: colors.textPrimary }}>
-                            Selected file: {selectedFile.name}
-                        </Text>
-                    )}
 
-                    {!selectedFile && existingResume && (
-                        <Text style={{ marginBottom: spacing.md, color: colors.textPrimary }}>
-                            Current file: {existingResume.fileName || existingResume.name}
-                        </Text>
-                    )}
                         <Text style={styles.label}>Resume Title</Text>
                         <TextInput
                             style={styles.input}
@@ -230,14 +229,9 @@ const AddResume = () => {
                             onChangeText={setIndustry}
                         />
 
-                        <TouchableOpacity
-                            style={styles.saveButton}
-                            activeOpacity={0.85}
-                            onPress={handleSave}
-                            disabled={saving}
-                        >
+                        <TouchableOpacity style={styles.saveButton} activeOpacity={0.85} onPress={handleSave}>
                             <Text style={styles.saveButtonText}>
-                                {saving ? "Saving..." : isEditing ? "Save Changes" : "Add Resume"}
+                                {isEditing ? 'Save Changes' : 'Add Resume'}
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -249,7 +243,7 @@ const AddResume = () => {
 
 export default AddResume
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,

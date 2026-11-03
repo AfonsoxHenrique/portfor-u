@@ -1,10 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../components/ScreenHeader";
-import BottomTabBar from "../components/BottomTabBar";
+import { useTheme } from "../../../theme/ThemeContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ScreenHeader from "../../../components/ScreenHeader";
 
 // Replace with real data from Firebase
 const MOCK_CERTIFICATES = [
@@ -13,26 +12,28 @@ const MOCK_CERTIFICATES = [
         name: 'AWS Cloud Practitioner',
         issuer: 'Amazon Web Services',
         earnedDate: 'Earned Oct 2025',
-        logo: require('../assets/certificate-icon/aws.png'),
+        logo: require('../../../assets/certificate-icon/aws.png'),
     },
     {
         id: '2',
         name: 'Certified ScrumMaster',
         issuer: 'Scrum Alliance',
         earnedDate: 'Earned Dec 2025',
-        logo: require('../assets/certificate-icon/scrum.png'),
+        logo: require('../../../assets/certificate-icon/scrum.png'),
     },
     {
         id: '3',
         name: 'Google UX Design Professional',
         issuer: 'Coursera',
         earnedDate: 'Earned Feb 2026',
-        logo: require('../assets/certificate-icon/coursera.png'),
+        logo: require('../../../assets/certificate-icon/coursera.png'),
     },
 ]
 
 const Certificates = () => {
     const router = useRouter()
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
 
     const handleAdd = () => {
         router.push('/add-certificate')
@@ -46,7 +47,6 @@ const Certificates = () => {
     }
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
                 <ScrollView
                     style={styles.scroll}
@@ -112,15 +112,14 @@ const Certificates = () => {
                     </View>
                 </ScrollView>
 
-                <BottomTabBar activeTab="certificates" />
+               
             </SafeAreaView>
-        </SafeAreaProvider>
     )
 }
 
 export default Certificates
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,

@@ -1,13 +1,12 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../components/ScreenHeader";
-import CircularProgress from "../components/CircularProgress";
-import ScoreRow from "../components/ScoreRow";
-import SuggestionCard from "../components/SuggestionCard";
-import BottomTabBar from "../components/BottomTabBar";
+import { useTheme } from "../../../theme/ThemeContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ScreenHeader from "../../../components/ScreenHeader";
+import CircularProgress from "../../../components/CircularProgress";
+import ScoreRow from "../../../components/ScoreRow";
+import SuggestionCard from "../../../components/SuggestionCard";
 
-//Get real analysis from api
+// Replace with a real analysis result from your resume-scoring API.
 const MOCK_ANALYSIS = {
     overallScore: 78,
     breakdown: [
@@ -33,25 +32,27 @@ const MOCK_ANALYSIS = {
 }
 
 const ResumeAnalyzer = () => {
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
+
     const handleReanalyze = () => {
-        //resume analyse api
+        // Wire this up to your resume-scoring API call.
     }
 
     return (
-        <SafeAreaProvider>
-            <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-
+            <SafeAreaView style={styles.safeArea} edges={['top']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <ScreenHeader
-                    title="Resume Analyzer"
-                    subtitle="INSTANT RESUME FEEDBACK SCORE"
-                    bg={colors.custom10}
-                    subtitleColor={colors.custom9}
+                        title="Resume Analyzer"
+                        subtitle="INSTANT RESUME FEEDBACK SCORE"
+                        bg={colors.purpleTint}
+                        subtitleColor={colors.purple}
                     />
+
                     <View style={styles.body}>
                         <CircularProgress
                             percent={MOCK_ANALYSIS.overallScore}
-                            color={colors.custom9}
+                            color={colors.purple}
                             label="RESUME SCORE"
                         />
 
@@ -71,18 +72,14 @@ const ResumeAnalyzer = () => {
                             <Text style={styles.reanalyzeButtonText}>Re-analyze Resume</Text>
                         </TouchableOpacity>
                     </View>
-                    
                 </ScrollView>
-
-                <BottomTabBar activeTab="resumes" />
             </SafeAreaView>
-        </SafeAreaProvider>
     )
 }
 
 export default ResumeAnalyzer
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
@@ -98,7 +95,7 @@ const styles = StyleSheet.create({
         paddingTop: spacing.lg,
     },
     breakdownCard: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,

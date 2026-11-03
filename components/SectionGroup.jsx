@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
-import { colors, spacing, radius } from "../theme/colors";
+import { useTheme } from "../theme/ThemeContext";
 
 const SectionGroup = ({ title, children }) => {
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
+
     return (
         <View style={styles.wrapper}>
             <Text style={styles.title}>{title}</Text>
@@ -12,7 +15,7 @@ const SectionGroup = ({ title, children }) => {
 
 export default SectionGroup
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     wrapper: {
         marginBottom: spacing.lg,
     },
@@ -24,7 +27,7 @@ const styles = StyleSheet.create({
         marginBottom: spacing.sm,
     },
     card: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,

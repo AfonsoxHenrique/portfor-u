@@ -1,18 +1,23 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
+import { useTheme } from "../../../theme/ThemeContext";
+
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import SectionGroup from "../components/SectionGroup";
-import SettingsRow from "../components/SettingsRow";
-import BottomTabBar from "../components/BottomTabBar";
+import SectionGroup from "../../../components/SectionGroup";
+import SettingsRow from "../../../components/SettingsRow";
+import SettingsSwitchRow from "../../../components/SettingsSwitchRow";
+
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../../../firebase/firebase";
 
 const Profile = () => {
-    const router = useRouter();
+    const router = useRouter()
+    const { colors, spacing, radius, isDark, toggleTheme } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
+
 
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
@@ -65,7 +70,6 @@ const Profile = () => {
     };
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                     <View style={styles.avatarBlock}>
@@ -98,7 +102,15 @@ const Profile = () => {
                             onPress={() => router.push('/notifications')}
                             showDivider
                         />
-                    </SectionGroup>
+                        <SettingsSwitchRow
+                        icon={isDark ? 'moon' : 'moon-outline'}
+                        title="Dark Mode"
+                        subtitle={isDark ? 'On' : 'Off'}
+                        value={isDark}
+                        onValueChange={toggleTheme}
+                        />
+                </SectionGroup>
+                    
 
                     <SectionGroup title="PRIVACY">
                         <SettingsRow
@@ -124,15 +136,14 @@ const Profile = () => {
                     </TouchableOpacity>
                 </ScrollView>
 
-                <BottomTabBar activeTab="profile" />
+                
             </SafeAreaView>
-        </SafeAreaProvider>
     )
 }
 
 export default Profile
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
@@ -169,7 +180,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     dangerGroup: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,

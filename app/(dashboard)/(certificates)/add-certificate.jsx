@@ -5,18 +5,19 @@ import {
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../../../theme/ThemeContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
-import ScreenHeader from "../components/ScreenHeader";
-import BottomTabBar from "../components/BottomTabBar";
+import ScreenHeader from "../../../components/ScreenHeader";
 
-import { auth, db, storage } from "../firebase/firebase";
+import { auth, db, storage } from "../../../firebase/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const AddCertificate = () => {
     const router = useRouter();
+    const { colors, spacing, radius } = useTheme()
+    const styles = createStyles(colors, spacing, radius)
     const [certName, setCertName] = useState("");
     const [issuer, setIssuer] = useState("");
     const [dateEarned, setDateEarned] = useState("");
@@ -81,7 +82,6 @@ const AddCertificate = () => {
     };
 
     return (
-        <SafeAreaProvider>
             <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
                 <ScrollView
                     style={styles.scroll}
@@ -173,15 +173,14 @@ const AddCertificate = () => {
                     </View>
                 </ScrollView>
 
-                <BottomTabBar activeTab="certificates" />
+
             </SafeAreaView>
-        </SafeAreaProvider>
     );
 };
 
 export default AddCertificate;
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: colors.surface },
     scroll: { flex: 1 },
     scrollContent: { paddingBottom: spacing.lg },

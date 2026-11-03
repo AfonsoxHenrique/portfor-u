@@ -32,6 +32,68 @@ export const colors = {
     amberTint: '#FBF1DA',
     red: '#D9455B',         // guideline icon color
     redTint: '#FBE3E8',
+    
+    dark: {
+        // Core surfaces
+        background: '#10151E',   // main app background
+        surface: '#1C2533',      // cards & bottom nav
+        elevated: '#253247',     // elevated panel
+        border: '#303D50',
+        homeHeader: '#1E3A8A',
+    
+        // Typography
+        textPrimary: '#F3F6FC',
+        textSecondary: '#B6C3D6',
+        textMuted: '#94A6BF',
+    
+        // Accents & controls
+        navy: '#3B82F6',
+        accentBlue: '#6AA5FF',   // active icons (brighter than "switch on" for contrast)
+        switchThumb: '#FFFFFF',
+        white: '#FFFFFF',        // text/icons drawn on top of colored buttons
+        success: '#35D6A1',      // green / progress
+        amber: '#E9BD55',        // gold / certificates
+        red: '#FF646D',          // red / delete actions
+        purple: '#B98CFF',
+    
+        // Tinted backgrounds
+        lightBlueTint: '#203454',
+        successTint: '#173C34',
+        amberTint: '#3C321D',
+        redTint: '#3D252E',
+        purpleTint: '#2E2440',
+    },
+
+    light: {
+        // Core surfaces
+        background: '#F8FAFC',   // main app background
+        surface: '#FFFFFF',      // cards, inputs, bottom nav
+        elevated: '#FFFFFF',     // no distinct "elevated panel" swatch in the light sheet — reuses surface
+        border: '#E2E8F0',
+        homeHeader: '#3B82F6',
+    
+        // Typography
+        textPrimary: '#0F172A',
+        textSecondary: '#475569',
+        textMuted: '#94A3B8',
+    
+        // Accents & controls
+        navy: '#1E3A8A',         // primary buttons
+        accentBlue: '#3B82F6',   // active icons / switch on
+        switchThumb: '#FFFFFF',
+        white: '#FFFFFF',        // text/icons drawn on top of colored buttons
+        success: '#10B981',      // green / progress
+        amber: '#B5820A',        // gold / certificates
+        red: '#EF4444',          // red / delete actions
+        purple: '#A05DF2',       // purple / resume analyze
+        
+        // Tinted backgrounds
+        lightBlueTint: '#EFF6FF',
+        successTint: '#EAFDEC',
+        amberTint: '#FFF7D7',
+        redTint: '#FEF2F2',
+        purpleTint: '#F2E6FF',
+    }
 }
 
 export const spacing = {
