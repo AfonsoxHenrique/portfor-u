@@ -11,6 +11,8 @@ import { useTheme } from "../../../theme/ThemeContext";
 import ScreenHeader from "../../../components/ScreenHeader";
 import { subscribeToProject, deleteProject, setProjectFeatured } from "../../../services/projects";
 import { formatRange } from "../../../utils/dates";
+import { getCategory } from "../../../theme/projectCategories";
+import { getLinkMeta } from "../../../utils/links";
 
 export default function ProjectDetails() {
     const router = useRouter();
@@ -51,7 +53,7 @@ export default function ProjectDetails() {
     };
 
     const handleDelete = () => {
-        Alert.alert("Delete project?", `"${project.title}" and its screenshots will be removed.`, [
+        Alert.alert("Delete project?", `"${project.title}" and its images will be removed.`, [
             { text: "Cancel", style: "cancel" },
             {
                 text: "Delete",
@@ -93,15 +95,17 @@ export default function ProjectDetails() {
         );
     }
 
+    const category = getCategory(project.category);
     const images = project.images ?? [];
-    const dateRange = formatRange(project.startDate, project.endDate);
+    const links = project.links ?? [];
     const tags = project.techStack ?? [];
+    const dateRange = formatRange(project.startDate, project.endDate);
 
     return (
         <SafeAreaView style={styles.safeArea} edges={["top"]}>
             <ScreenHeader
                 title={project.title}
-                subtitle={project.source === "github" ? "IMPORTED FROM GITHUB" : "PROJECT DETAILS"}
+                subtitle={project.source === "github" ? "IMPORTED FROM GITHUB" : category.label.toUpperCase()}
                 bg={colors.successTint}
                 subtitleColor={colors.success}
             />
@@ -138,7 +142,7 @@ export default function ProjectDetails() {
                     </View>
                 ) : (
                     <View style={styles.galleryPlaceholder}>
-                        <Ionicons name="code-slash" size={36} color={colors.success} />
+                        <Ionicons name={category.icon} size={36} color={colors.success} />
                     </View>
                 )}
 
@@ -146,6 +150,10 @@ export default function ProjectDetails() {
                     {/* Title row */}
                     <View style={styles.titleRow}>
                         <View style={styles.flex}>
+                            <View style={styles.categoryChip}>
+                                <Ionicons name={category.icon} size={12} color={colors.success} />
+                                <Text style={styles.categoryChipText}>{category.label}</Text>
+                            </View>
                             <Text style={styles.title}>{project.title}</Text>
                             {!!project.role && <Text style={styles.role}>{project.role}</Text>}
                         </View>
@@ -173,27 +181,24 @@ export default function ProjectDetails() {
                     {!!project.summary && <Text style={styles.summary}>{project.summary}</Text>}
 
                     {/* Links */}
-                    {(!!project.links?.github || !!project.links?.demo) && (
+                    {links.length > 0 && (
                         <View style={styles.linkRow}>
-                            {!!project.links?.github && (
-                                <Pressable style={styles.linkBtn} onPress={() => openLink(project.links.github)}>
-                                    <Ionicons name="logo-github" size={16} color={colors.textPrimary} />
-                                    <Text style={styles.linkText}>GitHub</Text>
-                                </Pressable>
-                            )}
-                            {!!project.links?.demo && (
-                                <Pressable style={styles.linkBtn} onPress={() => openLink(project.links.demo)}>
-                                    <Ionicons name="globe-outline" size={16} color={colors.textPrimary} />
-                                    <Text style={styles.linkText}>Live demo</Text>
-                                </Pressable>
-                            )}
+                            {links.map((url) => {
+                                const meta = getLinkMeta(url);
+                                return (
+                                    <Pressable key={url} style={styles.linkBtn} onPress={() => openLink(url)}>
+                                        <Ionicons name={meta.icon} size={16} color={colors.textPrimary} />
+                                        <Text style={styles.linkText} numberOfLines={1}>{meta.label}</Text>
+                                    </Pressable>
+                                );
+                            })}
                         </View>
                     )}
 
-                    {/* Tech stack */}
+                    {/* Skills */}
                     {tags.length > 0 && (
                         <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Tech stack</Text>
+                            <Text style={styles.sectionTitle}>{category.skillsLabel}</Text>
                             <View style={styles.tagRow}>
                                 {tags.map((tag) => (
                                     <View key={tag} style={styles.tag}>
@@ -253,6 +258,18 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
     dotActive: { width: 16, backgroundColor: colors.success },
     body: { padding: spacing.lg },
     titleRow: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
+    categoryChip: {
+        flexDirection: "row",
+        alignItems: "center",
+        alignSelf: "flex-start",
+        gap: 4,
+        backgroundColor: colors.successTint,
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 3,
+        borderRadius: radius.pill,
+        marginBottom: spacing.xs,
+    },
+    categoryChipText: { fontSize: 11, fontWeight: "700", color: colors.success },
     title: { fontSize: 22, fontWeight: "800", color: colors.textPrimary },
     role: { fontSize: 14, fontWeight: "600", color: colors.success, marginTop: 2 },
     featureBtn: {
@@ -273,11 +290,17 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         lineHeight: 20,
         marginTop: spacing.md,
     },
-    linkRow: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.md },
+    linkRow: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: spacing.sm,
+        marginTop: spacing.md,
+    },
     linkBtn: {
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
+        maxWidth: "100%",
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         borderRadius: radius.pill,
@@ -285,7 +308,7 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         borderColor: colors.border,
         backgroundColor: colors.surface,
     },
-    linkText: { fontSize: 13, fontWeight: "700", color: colors.textPrimary },
+    linkText: { flexShrink: 1, fontSize: 13, fontWeight: "700", color: colors.textPrimary },
     section: { marginTop: spacing.lg },
     sectionTitle: {
         fontSize: 15,

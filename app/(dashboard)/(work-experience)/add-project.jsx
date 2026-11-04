@@ -12,32 +12,28 @@ import { useTheme } from "../../../theme/ThemeContext";
 import ScreenHeader from "../../../components/ScreenHeader";
 import MonthYearField from "../../../components/MonthYearField";
 import TagInput from "../../../components/TagInput";
+import LinkListInput from "../../../components/LinkListInput";
 import { addProject, getProject, updateProject } from "../../../services/projects";
+import { PROJECT_CATEGORIES, getCategory } from "../../../theme/projectCategories";
+import { normalizeUrl } from "../../../utils/links";
 
 const MAX_IMAGES = 5;
 const SUMMARY_MAX = 120;
 
 const EMPTY_FORM = {
+    category: null,
     title: "",
     summary: "",
     description: "",
     role: "",
     techStack: [],
-    github: "",
-    demo: "",
+    links: [],
     startDate: null,
     endDate: null,
     ongoing: false,
     featured: false,
 };
 
-const normalizeUrl = (url) => {
-    const trimmed = url.trim();
-    if (!trimmed) return "";
-    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-};
-
-// Defined outside the screen so inputs don't lose focus on every keystroke
 const FormField = ({ label, styles, colors, multiline, ...inputProps }) => (
     <View style={styles.field}>
         <Text style={styles.label}>{label}</Text>
@@ -66,9 +62,9 @@ export default function AddProject() {
     const [loading, setLoading] = useState(isEdit);
     const [saving, setSaving] = useState(false);
 
+    const category = getCategory(form.category);
     const update = (key) => (value) => setForm((f) => ({ ...f, [key]: value }));
 
-    // Load existing project in edit mode
     useEffect(() => {
         if (!isEdit) return;
         (async () => {
@@ -80,13 +76,13 @@ export default function AddProject() {
                     return;
                 }
                 setForm({
+                    category: p.category ?? "other",
                     title: p.title ?? "",
                     summary: p.summary ?? "",
                     description: p.description ?? "",
                     role: p.role ?? "",
                     techStack: p.techStack ?? [],
-                    github: p.links?.github ?? "",
-                    demo: p.links?.demo ?? "",
+                    links: Array.isArray(p.links) ? p.links : [],
                     startDate: p.startDate ?? null,
                     endDate: p.endDate ?? null,
                     ongoing: !!p.startDate && !p.endDate,
@@ -108,7 +104,7 @@ export default function AddProject() {
     const pickImages = async () => {
         const remaining = MAX_IMAGES - imageCount;
         if (remaining <= 0) {
-            Alert.alert("Limit reached", `You can add up to ${MAX_IMAGES} screenshots.`);
+            Alert.alert("Limit reached", `You can add up to ${MAX_IMAGES} images.`);
             return;
         }
 
@@ -138,6 +134,10 @@ export default function AddProject() {
     ];
 
     const handleSave = async () => {
+        if (!form.category) {
+            Alert.alert("Pick a category", "Choose what kind of work this is.");
+            return;
+        }
         if (!form.title.trim()) {
             Alert.alert("Missing title", "Give your project a title.");
             return;
@@ -152,15 +152,13 @@ export default function AddProject() {
         }
 
         const data = {
+            category: form.category,
             title: form.title.trim(),
             summary: form.summary.trim(),
             description: form.description.trim(),
             role: form.role.trim(),
             techStack: form.techStack,
-            links: {
-                github: normalizeUrl(form.github),
-                demo: normalizeUrl(form.demo),
-            },
+            links: form.links.map(normalizeUrl).filter(Boolean),
             startDate: form.startDate,
             endDate: form.ongoing ? null : form.endDate,
             featured: form.featured,
@@ -196,7 +194,7 @@ export default function AddProject() {
         <SafeAreaView style={styles.safeArea} edges={["top"]}>
             <ScreenHeader
                 title={isEdit ? "Edit Project" : "Add Project"}
-                subtitle={isEdit ? "UPDATE YOUR PROJECT" : "SHOWCASE YOUR WORK"}
+                subtitle={isEdit ? "UPDATE YOUR WORK" : "SHOWCASE YOUR WORK"}
                 bg={colors.successTint}
                 subtitleColor={colors.success}
             />
@@ -210,16 +208,44 @@ export default function AddProject() {
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Screenshots */}
+                    {/* Category */}
                     <View style={styles.card}>
-                        <Text style={styles.cardTitle}>Screenshots</Text>
+                        <Text style={styles.cardTitle}>What kind of work is this?</Text>
+                        <View style={styles.categoryGrid}>
+                            {PROJECT_CATEGORIES.map((c) => {
+                                const active = form.category === c.id;
+                                return (
+                                    <Pressable
+                                        key={c.id}
+                                        onPress={() => update("category")(c.id)}
+                                        style={[styles.categoryChip, active && styles.categoryChipActive]}
+                                        accessibilityRole="radio"
+                                        accessibilityState={{ selected: active }}
+                                    >
+                                        <Ionicons
+                                            name={c.icon}
+                                            size={16}
+                                            color={active ? colors.white : colors.success}
+                                        />
+                                        <Text style={[styles.categoryText, active && styles.categoryTextActive]}>
+                                            {c.short}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
+                    </View>
+
+                    {/* Images */}
+                    <View style={styles.card}>
+                        <Text style={styles.cardTitle}>Images</Text>
                         <Text style={styles.hint}>
-                            The first image is your cover. Up to {MAX_IMAGES}.
+                            Screenshots, artwork, photos or thumbnails. The first one is the cover. Up to {MAX_IMAGES}.
                         </Text>
 
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.thumbRow}>
                             {thumbs.map((t, index) => (
-                                <View key={t.key} style={styles.thumbWrap}>
+                                <View key={t.key}>
                                     <Image source={{ uri: t.uri }} style={styles.thumb} />
                                     {index === 0 && (
                                         <View style={styles.coverBadge}>
@@ -244,12 +270,12 @@ export default function AddProject() {
                     {/* Basics */}
                     <View style={styles.card}>
                         <FormField
-                            label="Project title *"
+                            label="Title *"
                             styles={styles}
                             colors={colors}
                             value={form.title}
                             onChangeText={update("title")}
-                            placeholder="e.g. Portfor-U"
+                            placeholder={category.titlePlaceholder}
                         />
                         <FormField
                             label={`Short summary (${form.summary.length}/${SUMMARY_MAX})`}
@@ -257,16 +283,8 @@ export default function AddProject() {
                             colors={colors}
                             value={form.summary}
                             onChangeText={update("summary")}
-                            placeholder="One line shown on the project card"
+                            placeholder="One line shown on the card"
                             maxLength={SUMMARY_MAX}
-                        />
-                        <FormField
-                            label="Your role"
-                            styles={styles}
-                            colors={colors}
-                            value={form.role}
-                            onChangeText={update("role")}
-                            placeholder="e.g. Solo developer, Frontend lead"
                         />
                         <FormField
                             label="Description"
@@ -274,18 +292,18 @@ export default function AddProject() {
                             colors={colors}
                             value={form.description}
                             onChangeText={update("description")}
-                            placeholder="What it does, what you built, and the impact"
+                            placeholder={category.descriptionPlaceholder}
                             multiline
                         />
                     </View>
 
-                    {/* Tech stack */}
+                    {/* Skills */}
                     <View style={styles.card}>
                         <TagInput
-                            label="Tech stack"
+                            label={category.skillsLabel}
                             tags={form.techStack}
                             onChange={update("techStack")}
-                            placeholder="e.g. React Native, Firebase"
+                            placeholder={category.skillsPlaceholder}
                         />
                     </View>
 
@@ -305,7 +323,7 @@ export default function AddProject() {
                             />
                         </View>
 
-                        <View style={styles.switchRow}>
+                        <View style={[styles.switchRow, styles.switchRowSpaced]}>
                             <Text style={styles.switchLabel}>Still working on this</Text>
                             <Switch
                                 value={form.ongoing}
@@ -318,28 +336,7 @@ export default function AddProject() {
 
                     {/* Links */}
                     <View style={styles.card}>
-                        <FormField
-                            label="GitHub repository"
-                            styles={styles}
-                            colors={colors}
-                            value={form.github}
-                            onChangeText={update("github")}
-                            placeholder="github.com/you/project"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType="url"
-                        />
-                        <FormField
-                            label="Live demo"
-                            styles={styles}
-                            colors={colors}
-                            value={form.demo}
-                            onChangeText={update("demo")}
-                            placeholder="your-project.vercel.app"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType="url"
-                        />
+                        <LinkListInput links={form.links} onChange={update("links")} />
                     </View>
 
                     {/* Featured */}
@@ -399,6 +396,33 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         color: colors.textMuted,
         marginTop: 2,
     },
+    categoryGrid: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: spacing.sm,
+        marginTop: spacing.md,
+    },
+    categoryChip: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: radius.pill,
+        borderWidth: 1,
+        borderColor: colors.border,
+        backgroundColor: colors.background,
+    },
+    categoryChipActive: {
+        backgroundColor: colors.success,
+        borderColor: colors.success,
+    },
+    categoryText: {
+        fontSize: 13,
+        fontWeight: "600",
+        color: colors.textPrimary,
+    },
+    categoryTextActive: { color: colors.white },
     field: { marginBottom: spacing.md },
     label: {
         fontSize: 13,
@@ -421,7 +445,6 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         gap: spacing.sm,
         paddingTop: spacing.md,
     },
-    thumbWrap: { position: "relative" },
     thumb: {
         width: 96,
         height: 96,
@@ -469,8 +492,8 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginTop: spacing.md,
     },
+    switchRowSpaced: { marginTop: spacing.md },
     switchLabel: {
         fontSize: 14,
         fontWeight: "600",

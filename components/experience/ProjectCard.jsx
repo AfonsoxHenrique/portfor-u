@@ -3,28 +3,35 @@ import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme/ThemeContext";
 import { formatRange } from "../../utils/dates";
+import { getCategory } from "../../theme/projectCategories";
+import { getLinkMeta } from "../../utils/links";
 
 const MAX_TAGS = 3;
+const MAX_LINK_ICONS = 3;
 
 export default function ProjectCard({ project, onPress }) {
     const { colors, spacing, radius } = useTheme();
     const styles = useMemo(() => createStyles(colors, spacing, radius), [colors, spacing, radius]);
 
+    const category = getCategory(project.category);
     const cover = project.images?.[0]?.url;
     const tags = project.techStack ?? [];
     const extraTags = tags.length - MAX_TAGS;
+    const links = project.links ?? [];
     const dateRange = formatRange(project.startDate, project.endDate);
 
     return (
         <Pressable
             onPress={onPress}
             style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
+            accessibilityRole="button"
+            accessibilityLabel={`${project.title}, ${category.label}`}
         >
             {cover ? (
                 <Image source={{ uri: cover }} style={styles.cover} resizeMode="cover" />
             ) : (
                 <View style={[styles.cover, styles.coverPlaceholder]}>
-                    <Ionicons name="code-slash" size={28} color={colors.success} />
+                    <Ionicons name={category.icon} size={28} color={colors.success} />
                 </View>
             )}
 
@@ -36,6 +43,7 @@ export default function ProjectCard({ project, onPress }) {
             )}
 
             <View style={styles.body}>
+                <Text style={styles.categoryLabel}>{category.label.toUpperCase()}</Text>
                 <Text style={styles.title} numberOfLines={1}>{project.title}</Text>
 
                 {!!project.summary && (
@@ -58,15 +66,23 @@ export default function ProjectCard({ project, onPress }) {
                 )}
 
                 <View style={styles.metaRow}>
-                    {dateRange && <Text style={styles.meta}>{dateRange}</Text>}
-                    <View style={styles.metaIcons}>
-                        {!!project.links?.github && (
-                            <Ionicons name="logo-github" size={15} color={colors.textSecondary} />
-                        )}
-                        {!!project.links?.demo && (
-                            <Ionicons name="globe-outline" size={15} color={colors.textSecondary} />
-                        )}
-                    </View>
+                    {dateRange ? <Text style={styles.meta}>{dateRange}</Text> : <View />}
+
+                    {links.length > 0 && (
+                        <View style={styles.metaIcons}>
+                            {links.slice(0, MAX_LINK_ICONS).map((url) => (
+                                <Ionicons
+                                    key={url}
+                                    name={getLinkMeta(url).icon}
+                                    size={15}
+                                    color={colors.textSecondary}
+                                />
+                            ))}
+                            {links.length > MAX_LINK_ICONS && (
+                                <Text style={styles.meta}>+{links.length - MAX_LINK_ICONS}</Text>
+                            )}
+                        </View>
+                    )}
                 </View>
             </View>
         </Pressable>
@@ -115,6 +131,13 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
     body: {
         padding: spacing.md,
     },
+    categoryLabel: {
+        fontSize: 10,
+        fontWeight: "700",
+        letterSpacing: 0.8,
+        color: colors.success,
+        marginBottom: 2,
+    },
     title: {
         fontSize: 15,
         fontWeight: "800",
@@ -156,6 +179,7 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
     },
     metaIcons: {
         flexDirection: "row",
+        alignItems: "center",
         gap: spacing.sm,
     },
 });
