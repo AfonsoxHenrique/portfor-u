@@ -14,6 +14,9 @@ import { auth, db, storage } from "../../../firebase/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../../firebase/firebase";
+
 const AddCertificate = () => {
     const router = useRouter();
     const { colors, spacing, radius } = useTheme()
@@ -22,8 +25,37 @@ const AddCertificate = () => {
     const [issuer, setIssuer] = useState("");
     const [dateEarned, setDateEarned] = useState("");
     const [credentialId, setCredentialId] = useState("");
+    const [verificationURL, setVerificationURL] = useState("");
     const [file, setFile] = useState(null);
     const [saving, setSaving] = useState(false);
+
+    const checkCertificateURL = async ({ verificationURL, credentialId, issuer, }) => {
+        if (!verificationURL && !credentialId) {
+            return {
+                verificationStatus: "not_provided",
+                message: null,
+            };
+        }
+
+        try {
+            const checkURL = httpsCallable(functions, "checkCertificateURL");
+
+            const result = await checkURL({
+                verificationURL: verificationURL || "",
+                credentialId: credentialId || "",
+                issuer: issuer || "",
+            });
+
+            return result.data;
+        } catch (error) {
+            console.error("Certificate verification error:", error);
+
+            return {
+                verificationStatus: "unconfirmed",
+                message: "Could not check this certificate.",
+            };
+        }
+    };
 
     const handleChooseFile = async () => {
         try {
@@ -47,6 +79,26 @@ const AddCertificate = () => {
         const user = auth.currentUser;
         if (!user) { Alert.alert("Please log in", "Log in to add a certificate."); return; }
 
+        if (verificationURL.trim()) {
+            try {
+                const parsedURL = new URL(verificationURL.trim());
+
+                if (parsedURL.protocol !== "https:") {
+                    Alert.alert(
+                        "Invalid URL",
+                        "Please enter a secure HTTPS verification link."
+                    );
+                    return;
+                }
+            } catch {
+                Alert.alert(
+                    "Invalid URL",
+                    "Please enter a valid verification URL."
+                );
+                return;
+            }
+        }
+
         try {
             setSaving(true);
             let downloadURL = null;
@@ -61,14 +113,29 @@ const AddCertificate = () => {
                 await uploadBytes(fileRef, blob, { contentType: file.mimeType || "application/octet-stream" });
                 downloadURL = await getDownloadURL(fileRef);
             }
+            
+            const verificationResult = await checkCertificateURL({
+                verificationURL: verificationURL.trim(),
+                credentialId: credentialId.trim(),
+                issuer: issuer.trim(),
+            });
 
             await addDoc(collection(db, "users", user.uid, "certificates"), {
                 name: certName.trim(),
                 issuer: issuer.trim(),
                 earnedDate: dateEarned.trim(),
                 credentialId: credentialId.trim() || null,
+                verificationURL: verificationURL.trim() || null,
+                verificationStatus: verificationResult.verificationStatus,
+                ownershipStatus: verificationResult.ownershipStatus || "unconfirmed",
+                revocationStatus: verificationResult.revocationStatus || "unknown",
+                verificationCheckedAt: serverTimestamp(),
+                verificationMessage: verificationResult.message || verificationResult.verificationMessage || null,
+                detectedIssuer: verificationResult.issuer || null,
+                verificationMethod: verificationResult.verificationMethod || null,
                 downloadURL: downloadURL || null,
                 storagePath: storagePath || null,
+                
                 createdAt: serverTimestamp(),
             });
 
@@ -132,13 +199,25 @@ const AddCertificate = () => {
                             </View>
 
                             {/* Credential ID */}
-                            <Text style={styles.label}>Credential ID or URL (optional)</Text>
+                            <Text style={styles.label}>Credential ID (optional)</Text>
                             <TextInput
-                                style={[styles.input, { marginBottom: 0 }]}
+                                style={styles.input}
                                 value={credentialId}
                                 onChangeText={setCredentialId}
-                                placeholder="Enter credential ID or link"
+                                placeholder="Enter credential ID"
                                 placeholderTextColor={colors.textMuted}
+                            />
+
+                            <Text style={styles.label}>Verification URL (optional)</Text>
+                            <TextInput
+                                style={[styles.input, { marginBottom: 0 }]}
+                                value={verificationURL}
+                                onChangeText={setVerificationURL}
+                                placeholder="https://example.com/verify/..."
+                                placeholderTextColor={colors.textMuted}
+                                keyboardType="url"
+                                autoCapitalize="none"
+                                autoCorrect={false}
                             />
                         </View>
 
