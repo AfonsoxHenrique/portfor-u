@@ -69,7 +69,7 @@ const Profile = () => {
     };
 
     return (
-            <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+            <SafeAreaView style={styles.safeArea} edges={['top']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                     <View style={styles.avatarBlock}>
                         <View style={styles.avatar} />
