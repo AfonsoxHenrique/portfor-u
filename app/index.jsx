@@ -1,51 +1,75 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { useMemo } from "react";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Redirect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../theme/ThemeContext";
+import { useAuthUser } from "../hooks/useAuthUser";
 
 const Welcome = () => {
     const router = useRouter()
+    const { user, initializing } = useAuthUser()
+    const { colors, spacing, radius } = useTheme()
+    const styles = useMemo(() => createStyles(colors, spacing, radius), [colors, spacing, radius])
+
+    // Firebase is still restoring the saved session
+    if (initializing) {
+        return (
+            <View style={styles.loading}>
+                <ActivityIndicator color={colors.navy} />
+            </View>
+        )
+    }
+
+    // Skip welcome screen if logged in
+    if (user) {
+        return <Redirect href={user.emailVerified ? "/home" : "/verify-email"} />
+    }
 
     return (
-        <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
-                <Image 
-                    style={styles.illustration} 
-                    source={require('../assets/Portfor-3.png')}
-                />
-                <Text style={styles.headline}>Your Professional Launchpad</Text>
-                <Text style={styles.description}>
-                    Organize your resume, log your project experience, showcase certificates and badges,
-                    and learn from the guidelines.
-                </Text>
+        <SafeAreaView style={styles.container}>
+            <Image
+                style={styles.illustration}
+                source={require('../assets/Portfor-3.png')}
+                resizeMode="contain"
+            />
+            <Text style={styles.headline}>Your Professional Launchpad</Text>
+            <Text style={styles.description}>
+                Organize your resume, log your project experience, showcase certificates and badges,
+                and learn from the guidelines.
+            </Text>
 
-                <View style={styles.actions}>
-                    <TouchableOpacity
-                        style={styles.primaryButton}
-                        activeOpacity={0.85}
-                        onPress={() => router.push("signup")}
-                    >
-                        <Text style={styles.primaryButtonText}>Create a new Account</Text>
-                        <Ionicons name="arrow-forward" size={18} color={colors.white} />
-                    </TouchableOpacity>
+            <View style={styles.actions}>
+                <TouchableOpacity
+                    style={styles.primaryButton}
+                    activeOpacity={0.85}
+                    onPress={() => router.push("/signup")}
+                >
+                    <Text style={styles.primaryButtonText}>Create a new Account</Text>
+                    <Ionicons name="arrow-forward" size={18} color={colors.white} />
+                </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.secondaryButton}
-                        activeOpacity={0.85}
-                        onPress={() => router.push("login")}
-                    >
-                        <Text style={styles.secondaryButtonText}>Sign In</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
-        </SafeAreaProvider>
+                <TouchableOpacity
+                    style={styles.secondaryButton}
+                    activeOpacity={0.85}
+                    onPress={() => router.push("/login")}
+                >
+                    <Text style={styles.secondaryButtonText}>Sign In</Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
     )
 }
 
 export default Welcome
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
+    loading: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: colors.background,
+    },
     container: {
         flex: 1,
         backgroundColor: colors.background,
