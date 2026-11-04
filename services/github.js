@@ -22,7 +22,7 @@ export async function fetchGithubRepos(username) {
       techStack: r.topics?.length ? r.topics : r.language ? [r.language] : [],
       links: { github: r.html_url, demo: r.homepage || "" },
       startDate: r.created_at?.slice(0, 7) ?? null,
-      endDate: null,
+      endDate: r.pushed_at?.slice(0, 7) ?? null,
       stars: r.stargazers_count,
     }));
 }

@@ -35,9 +35,17 @@ export default function WorkList({ onCountChange }) {
                 const items = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
 
                 items.sort((a, b) => {
-                    const dateA = a.updatedAt?.toDate?.()?.getTime() || 0;
-                    const dateB = b.updatedAt?.toDate?.()?.getTime() || 0;
-                    return dateB - dateA;
+                    // 1. Jobs you currently work at come first
+                    if (a.currentlyWorkHere !== b.currentlyWorkHere) {
+                        return a.currentlyWorkHere ? -1 : 1;
+                    }
+
+                    // 2. Then by end date, most recent first
+                    const endCompare = (b.endDate ?? "").localeCompare(a.endDate ?? "");
+                    if (endCompare !== 0) return endCompare;
+
+                    // 3. If end dates match (or both are current), by start date, most recent first
+                    return (b.startDate ?? "").localeCompare(a.startDate ?? "");
                 });
 
                 setExperiences(items);

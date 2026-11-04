@@ -1,5 +1,5 @@
 import {
-  collection, doc, setDoc, updateDoc, deleteDoc,
+  collection, doc, setDoc, updateDoc, deleteDoc, getDoc,
   query, orderBy, onSnapshot, serverTimestamp, writeBatch,
 } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
@@ -87,4 +87,21 @@ export async function importProjects(repos, existingProjects = []) {
 
   if (count) await batch.commit();
   return count;
+}
+
+export async function getProject(id) {
+  const snap = await getDoc(doc(projectsCol(), id));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export function subscribeToProject(id, onData, onError) {
+  return onSnapshot(
+    doc(projectsCol(), id),
+    (snap) => onData(snap.exists() ? { id: snap.id, ...snap.data() } : null),
+    onError
+  );
+}
+
+export async function setProjectFeatured(id, featured) {
+  await updateDoc(doc(projectsCol(), id), { featured, updatedAt: serverTimestamp() });
 }

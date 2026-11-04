@@ -9,7 +9,7 @@ import { useAuthUser } from "../hooks/useAuthUser";
 const Welcome = () => {
     const router = useRouter()
     const { user, initializing } = useAuthUser()
-    const { colors, spacing, radius } = useTheme()
+    const { colors, spacing, radius, isDark } = useTheme()
     const styles = useMemo(() => createStyles(colors, spacing, radius), [colors, spacing, radius])
 
     // Firebase is still restoring the saved session
@@ -30,7 +30,9 @@ const Welcome = () => {
         <SafeAreaView style={styles.container}>
             <Image
                 style={styles.illustration}
-                source={require('../assets/Portfor-3.png')}
+                source={
+                    isDark ?
+                    require('../assets/Portfor-3W.png') : require('../assets/Portfor-3.png')}
                 resizeMode="contain"
             />
             <Text style={styles.headline}>Your Professional Launchpad</Text>

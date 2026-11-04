@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function DashboardLayout() {
     const { user, initializing } = useAuthUser()
-    const {colors } = useTheme()
+    const { colors, isDark } = useTheme()
     const insets = useSafeAreaInsets()
 
     if (initializing) {
@@ -29,9 +29,10 @@ export default function DashboardLayout() {
                 backgroundColor: colors.surface,
                 height: 60 + insets.bottom,
                 paddingBottom: insets.bottom,
+                borderTopColor: colors.border,
             },
             tabBarActiveTintColor: "#3B82F6", 
-            tabBarInactiveTintColor: "#494949",
+            tabBarInactiveTintColor: isDark ? "#FFFFFF" : "#494949",
         }}
     >
 

@@ -2,20 +2,7 @@ import { useMemo } from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme/ThemeContext";
-
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const formatMonth = (ym) => {
-    if (!ym) return null;
-    const [y, m] = ym.split("-").map(Number);
-    return `${MONTHS[m - 1]} ${y}`;
-};
-
-const formatRange = (start, end) => {
-    const s = formatMonth(start);
-    if (!s) return null;
-    return `${s} – ${formatMonth(end) ?? "Present"}`;
-};
+import { formatRange } from "../../utils/dates";
 
 const MAX_TAGS = 3;
 
