@@ -8,10 +8,10 @@ async function testResume() {
   try {
     console.log("Step 1: Preparing test resume...");
 
-    const pdfPath = path.join(__dirname, "sample-resume.pdf");
+    const pdfPath = path.join(__dirname, "Test_resume_Wendy.pdf");
 
     if (!fs.existsSync(pdfPath)) {
-      console.log("Please place sample-resume.pdf inside the backend folder.");
+      console.log("Please place Test_resume_Wendy.pdf inside the backend folder.");
       return;
     }
 
@@ -29,7 +29,7 @@ async function testResume() {
         },
         body: JSON.stringify({
           fileBase64,
-          fileName: "sample-resume.pdf",
+          fileName: "Test_resume_Wendy.pdf",
           mimeType: "application/pdf",
           targetRole: "Junior Software Developer",
         }),
