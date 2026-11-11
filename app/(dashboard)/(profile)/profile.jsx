@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../../theme/ThemeContext";
@@ -18,7 +18,7 @@ const Profile = () => {
     const { colors, spacing, radius, isDark, toggleTheme } = useTheme()
     const styles = createStyles(colors, spacing, radius)
 
-
+    const [photoURL, setPhotoURL] = useState(null);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(true);
@@ -33,9 +33,10 @@ const Profile = () => {
             try {
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
-
+                
                 if (userSnap.exists()) {
                     const data = userSnap.data();
+                    setPhotoURL(data.photoURL || user.photoURL || null);
 
                     setFullName(
                         `${data.firstName || ""} ${data.lastName || ""}`.trim()
@@ -72,7 +73,20 @@ const Profile = () => {
             <SafeAreaView style={styles.safeArea} edges={['top']}>
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                     <View style={styles.avatarBlock}>
-                        <View style={styles.avatar} />
+                        <View style={styles.avatar}>
+                        {photoURL ? (
+                            <Image
+                                source={{ uri: photoURL }}
+                                style={styles.avatarImage}
+                            />
+                        ) : (
+                            <Ionicons
+                                name="person-outline"
+                                size={40}
+                                color={colors.accentBlue}
+                            />
+                        )}
+                    </View>
                         <Text style={styles.name}>
                         {loading ? "Loading..." : fullName}
                     </Text>
@@ -143,6 +157,11 @@ const Profile = () => {
 export default Profile
 
 const createStyles = (colors, spacing, radius) => StyleSheet.create({
+    avatarImage: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 44,
+    },
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,

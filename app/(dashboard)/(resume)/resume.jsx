@@ -68,6 +68,14 @@ const Resumes = () => {
             return unsubscribe;
         }, []);
 
+        const handleEdit = (resume) => {
+            router.push({
+                pathname: "/add-resume",
+                params: {
+                    id: resume.id,
+                },
+            });
+        };
 
         const handleView = async (resume) => {
             if (!resume.downloadURL) {

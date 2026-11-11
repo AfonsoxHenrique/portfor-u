@@ -4,6 +4,7 @@ import {
     ActivityIndicator,
     Alert,
     ScrollView,
+    Image,
     StyleSheet,
     Text,
     TextInput,
@@ -14,19 +15,30 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { updateEmail, updateProfile } from "firebase/auth";
-import { auth, db } from "../../../firebase/firebase";
+import { auth, db, storage } from "../../../firebase/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { colors, spacing, radius } from "../../../theme/colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader   from "../../../components/ScreenHeader"
+import * as ImagePicker from "expo-image-picker";
 
 const EditProfile = () => {
     const router = useRouter();
 
+    const [selectedImage, setSelectedImage] = useState(null);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [originalEmail, setOriginalEmail] = useState("");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [profilePhoto, setProfilePhoto] = useState(null);
+
+    const [phone, setPhone] = useState("");
+    const [location, setLocation] = useState("");
+    const [headline, setHeadline] = useState("");
+    const [bio, setBio] = useState("");
+    const [linkedin, setLinkedin] = useState("");
+    const [portfolio, setPortfolio] = useState("");
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -52,6 +64,13 @@ const EditProfile = () => {
                 setFullName(name);
                 setEmail(data.email || user.email || "");
                 setOriginalEmail(user.email || "");
+                setPhone(data.phone || "");
+                setLocation(data.location || "");
+                setHeadline(data.headline || "");
+                setBio(data.bio || "");
+                setLinkedin(data.linkedin || "");
+                setPortfolio(data.portfolio || "");
+                setProfilePhoto(data.photoURL || user.photoURL || null);
             } catch (error) {
                 console.error("Load profile error:", error);
                 Alert.alert("Error", "Could not load your profile.");
@@ -62,6 +81,34 @@ const EditProfile = () => {
 
         loadProfile();
     }, []);
+
+    const handleChoosePhoto = async () => {
+        const permission =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (!permission.granted) {
+            Alert.alert("Permission required", "Please allow access to your photos.");
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images"],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            const photo = result.assets[0];
+
+            if (photo.fileSize && photo.fileSize > 5 * 1024 * 1024) {
+                Alert.alert("File too large", "Please choose an image smaller than 5 MB.");
+                return;
+            }
+
+            setSelectedImage(photo);
+        }
+    };
 
     const handleSave = async () => {
         const user = auth.currentUser;
@@ -92,7 +139,7 @@ const EditProfile = () => {
         setSaving(true);
 
         try {
-            // Updating an email may require recent authentication.
+            // Updating an email require recent authentication.
             if (trimmedEmail !== originalEmail) {
                 await updateEmail(user, trimmedEmail);
             }
@@ -101,6 +148,26 @@ const EditProfile = () => {
                 displayName: trimmedName,
             });
 
+            let photoURL = user.photoURL || null;
+
+            if (selectedImage) {
+                const response = await fetch(selectedImage.uri);
+                const blob = await response.blob();
+
+                const storagePath = `users/${user.uid}/profile/profile-picture.jpg`;
+                const imageRef = ref(storage, storagePath);
+
+                await uploadBytes(imageRef, blob, {
+                    contentType: "image/jpeg",
+                });
+
+                photoURL = await getDownloadURL(imageRef);
+
+                await updateProfile(user, {
+                    photoURL,
+                });
+            }
+
             await setDoc(
                 doc(db, "users", user.uid),
                 {
@@ -108,6 +175,13 @@ const EditProfile = () => {
                     firstName,
                     lastName,
                     email: trimmedEmail,
+                    photoURL,
+                    phone: phone.trim(),
+                    location: location.trim(),
+                    headline: headline.trim(),
+                    bio: bio.trim(),
+                    linkedin: linkedin.trim(),
+                    portfolio: portfolio.trim(),
                     updatedAt: new Date(),
                 },
                 { merge: true }
@@ -165,20 +239,24 @@ const EditProfile = () => {
                     <TouchableOpacity
                         style={styles.avatarContainer}
                         activeOpacity={0.7}
-                        onPress={() =>
-                            Alert.alert(
-                                "Profile photo",
-                                "Connect an image picker to enable photo uploads."
-                            )
-                        }
+                        onPress={handleChoosePhoto}
                     >
                         <View style={styles.avatar}>
-                            <Ionicons
-                                name="person-outline"
-                                size={40}
-                                color={colors.accentBlue}
-                            />
-                        </View>
+                            {selectedImage || profilePhoto ? (
+                                <Image
+                                    source={{
+                                        uri: selectedImage?.uri || profilePhoto,
+                                    }}
+                                    style={styles.avatarImage}
+                                />
+                                ) : (
+                                <Ionicons
+                                    name="person-outline"
+                                    size={40}
+                                    color={colors.accentBlue}
+                                />
+                            )}
+                    </View>
                         <View style={styles.cameraButton}>
                             <Ionicons name="camera" size={18} color={colors.white} />
                         </View>
@@ -211,6 +289,66 @@ const EditProfile = () => {
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
+
+                    <Text style={styles.label}>Phone Number</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={phone}
+                        onChangeText={setPhone}
+                        placeholder="+61 400 000 000"
+                        placeholderTextColor={colors.textMuted}
+                        keyboardType="phone-pad"
+                    />
+
+                    <Text style={styles.label}>Location</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={location}
+                        onChangeText={setLocation}
+                        placeholder="Melbourne, Australia"
+                        placeholderTextColor={colors.textMuted}
+                    />
+
+                    <Text style={styles.label}>Professional Headline</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={headline}
+                        onChangeText={setHeadline}
+                        placeholder="Junior Software Developer"
+                        placeholderTextColor={colors.textMuted}
+                    />
+
+                    <Text style={styles.label}>About Me</Text>
+                    <TextInput
+                        style={[styles.input, { minHeight: 100, textAlignVertical: "top" }]}
+                        value={bio}
+                        onChangeText={setBio}
+                        placeholder="Tell people about yourself..."
+                        placeholderTextColor={colors.textMuted}
+                        multiline
+                    />
+
+                    <Text style={styles.label}>LinkedIn Profile</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={linkedin}
+                        onChangeText={setLinkedin}
+                        placeholder="https://linkedin.com/in/yourprofile"
+                        placeholderTextColor={colors.textMuted}
+                        keyboardType="url"
+                        autoCapitalize="none"
+                    />
+
+                    <Text style={styles.label}>Portfolio Website</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={portfolio}
+                        onChangeText={setPortfolio}
+                        placeholder="https://yourportfolio.com"
+                        placeholderTextColor={colors.textMuted}
+                        keyboardType="url"
+                        autoCapitalize="none"
+                    />
                 </View>
 
                 <TouchableOpacity
@@ -233,6 +371,11 @@ const EditProfile = () => {
 export default EditProfile;
 
 const styles = StyleSheet.create({
+    avatarImage: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 47,
+    },
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
