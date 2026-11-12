@@ -74,6 +74,21 @@ export default function DashboardLayout() {
             )}}
         />
 
+        {/* For Education */}
+        <Tabs.Screen
+            name="(education)"
+            options={{
+                title: "Education",
+                tabBarIcon: ({ focused, color }) => (
+                    <Ionicons
+                        size={24}
+                        color={color}
+                        name={focused ? "school" : "school-outline"}
+                    />
+                )
+            }}
+        />
+
         {/* For Certificates */}
         <Tabs.Screen
             name="(certificates)"
