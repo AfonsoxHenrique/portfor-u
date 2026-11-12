@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput, ActivityIndicator,Alert,} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { encode } from "base64-arraybuffer";
@@ -11,11 +11,17 @@ import ScoreRow from "../../../components/ScoreRow";
 import SuggestionCard from "../../../components/SuggestionCard";
 import { auth } from "../../../firebase/firebase";
 
-// Firebase Cloud Function URL
-const ANALYZE_RESUME_URL =
-    "https://australia-southeast1-portfor-u.cloudfunctions.net/analyzeResume";
+// Local Node.js Backend URL
+// IMPORTANT: Replace this IP with your Windows computer's IPv4 address.
+// Example: "http://192.168.1.100:3000"
+// Keep the backend server running on your Windows computer.
+const BACKEND_URL =
+    Platform.OS === "web"
+        ? "http://localhost:3000"
+        : "http://192.168.1.74:3000";
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024;
+const ANALYZE_RESUME_URL = `${BACKEND_URL}/api/analyze-resume`;
+const MAX_FILE_SIZE = 7 * 1024 * 1024;
 
 const ResumeAnalyzer = () => {
     const { colors, spacing, radius } = useTheme();
@@ -30,10 +36,7 @@ const ResumeAnalyzer = () => {
     const handleUpload = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
-                type: [
-                    "application/pdf",
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ],
+                type: "application/pdf",
                 copyToCacheDirectory: true,
                 multiple: false,
             });
@@ -45,7 +48,7 @@ const ResumeAnalyzer = () => {
             if (file.size && file.size > MAX_FILE_SIZE) {
                 Alert.alert(
                     "File too large",
-                    "Please upload a PDF or DOCX file smaller than 8 MB."
+                    "Please upload a PDF file smaller than 7 MB."
                 );
                 return;
             }
@@ -87,30 +90,24 @@ const ResumeAnalyzer = () => {
             const arrayBuffer = await fileResponse.arrayBuffer();
 
             if (!arrayBuffer.byteLength || arrayBuffer.byteLength > MAX_FILE_SIZE) {
-                throw new Error("The file is empty or larger than 8 MB.");
+                throw new Error("The file is empty or larger than 7 MB.");
             }
 
             // Convert file to Base64
             const fileBase64 = encode(arrayBuffer);
 
-            // Get Firebase authentication token
-            const idToken = await user.getIdToken();
-
-            // Call Firebase Cloud Function
+            // Call the local Node.js Backend.
+            // Firebase login is still required above, but this local
+            // prototype backend does not validate Firebase ID tokens.
             const response = await fetch(ANALYZE_RESUME_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${idToken}`,
                 },
                 body: JSON.stringify({
                     fileBase64,
                     fileName: selectedFile.name,
-                    mimeType:
-                        selectedFile.mimeType ||
-                        (selectedFile.name.toLowerCase().endsWith(".pdf")
-                            ? "application/pdf"
-                            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+                    mimeType: "application/pdf",
                     targetRole: targetRole.trim(),
                 }),
             });
@@ -293,9 +290,9 @@ const ResumeAnalyzer = () => {
                         )}
 
                         <Text style={styles.privacyNote}>
-                            Your resume is securely sent to the AI analysis
-                            service for processing. Please avoid uploading
-                            documents containing sensitive information.
+                            Your PDF is sent to the Portfor-U backend and Gemini AI
+                            for analysis. Please avoid uploading documents containing
+                            sensitive personal information during prototype testing.
                         </Text>
                     </View>
 
@@ -331,7 +328,7 @@ const ResumeAnalyzer = () => {
                                     <ScoreRow
                                         key={`${row.label}-${index}`}
                                         label={row.label}
-                                        percent={Number(row.percent) || 0}
+                                        percent={Number(row.score) || 0}
                                         color={colors.navy}
                                     />
                                 ))}
@@ -370,13 +367,13 @@ const ResumeAnalyzer = () => {
 
                             {(analysis.suggestions || []).map((item, index) => (
                                 <SuggestionCard
-                                    key={`${item.title}-${index}`}
-                                    title={
-                                        item.priority
-                                            ? `${item.priority}: ${item.title}`
-                                            : item.title
+                                    key={`suggestion-${index}`}
+                                    title={`Improvement ${index + 1}`}
+                                    description={
+                                        typeof item === "string"
+                                            ? item
+                                            : item.description || item.title || ""
                                     }
-                                    description={item.description}
                                 />
                             ))}
 
