@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Platform } from "react-native";
 import { useAuthUser } from "../../hooks/useAuthUser";
 import {useTheme } from "../../theme/ThemeContext"
 import { Ionicons } from "@expo/vector-icons"
@@ -9,6 +9,8 @@ export default function DashboardLayout() {
     const { user, initializing } = useAuthUser()
     const { colors, isDark } = useTheme()
     const insets = useSafeAreaInsets()
+
+    if (Platform.OS === "web") return <Redirect href="/" />;
 
     if (initializing) {
         return (

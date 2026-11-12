@@ -3,9 +3,9 @@ export const colors = {
     
     dark: {
         // Core surfaces
-        background: '#10151E',   // main app background
-        surface: '#1C2533',      // cards & bottom nav
-        elevated: '#253247',     // elevated panel
+        background: '#10151E',   
+        surface: '#1C2533',      
+        elevated: '#253247',     
         border: '#303D50',
         homeHeader: '#1E3A8A',
         border: '#E3E8F0',
@@ -14,15 +14,16 @@ export const colors = {
         textPrimary: '#F3F6FC',
         textSecondary: '#B6C3D6',
         textMuted: '#94A6BF',
+        segmentedText: '#0F172A',
     
         // Accents & controls
         navy: '#3B82F6',
-        accentBlue: '#6AA5FF',   // active icons (brighter than "switch on" for contrast)
+        accentBlue: '#6AA5FF',   
         switchThumb: '#FFFFFF',
-        white: '#FFFFFF',        // text/icons drawn on top of colored buttons
-        success: '#35D6A1',      // green / progress
-        amber: '#E9BD55',        // gold / certificates
-        red: '#FF646D',          // red / delete actions
+        white: '#FFFFFF',       
+        success: '#35D6A1',      
+        amber: '#E9BD55',        
+        red: '#FF646D',          
         purple: '#B98CFF',
     
         // Tinted backgrounds
@@ -35,9 +36,9 @@ export const colors = {
 
     light: {
         // Core surfaces
-        background: '#F8FAFC',   // main app background
-        surface: '#FFFFFF',      // cards, inputs, bottom nav
-        elevated: '#FFFFFF',     // no distinct "elevated panel" swatch in the light sheet — reuses surface
+        background: '#F8FAFC',   
+        surface: '#FFFFFF',      
+        elevated: '#FFFFFF',    
         border: '#E2E8F0',
         homeHeader: '#3B82F6',
         border: '#E3E8F0',
@@ -46,16 +47,17 @@ export const colors = {
         textPrimary: '#0F172A',
         textSecondary: '#475569',
         textMuted: '#94A3B8',
+        segmentedText: '#0F172A',
     
         // Accents & controls
-        navy: '#1E3A8A',         // primary buttons
-        accentBlue: '#3B82F6',   // active icons / switch on
+        navy: '#1E3A8A',         
+        accentBlue: '#3B82F6',   
         switchThumb: '#FFFFFF',
-        white: '#FFFFFF',        // text/icons drawn on top of colored buttons
-        success: '#10B981',      // green / progress
-        amber: '#B5820A',        // gold / certificates
-        red: '#EF4444',          // red / delete actions
-        purple: '#A05DF2',       // purple / resume analyze
+        white: '#FFFFFF',        
+        success: '#10B981',      
+        amber: '#B5820A',        
+        red: '#EF4444',          
+        purple: '#A05DF2',       
         
         // Tinted backgrounds
         lightBlueTint: '#EFF6FF',

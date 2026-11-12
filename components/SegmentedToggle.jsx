@@ -54,6 +54,6 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
     label: {
         fontSize: 13.5,
         fontWeight: "700",
-        color: colors.textSecondary,
+        color: colors.segmentedText,
     },
 });

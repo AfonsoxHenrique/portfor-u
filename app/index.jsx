@@ -1,12 +1,14 @@
 import { useMemo } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, Platform } from "react-native";
 import { Redirect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../theme/ThemeContext";
 import { useAuthUser } from "../hooks/useAuthUser";
 
-const Welcome = () => {
+import WebLanding from "../components/WebLanding";
+
+const MobileWelcome = () => {
     const router = useRouter()
     const { user, initializing } = useAuthUser()
     const { colors, spacing, radius, isDark } = useTheme()
@@ -61,9 +63,12 @@ const Welcome = () => {
             </View>
         </SafeAreaView>
     )
-}
+};
 
-export default Welcome
+
+export default function Index(){
+     return Platform.OS === "web" ? <WebLanding /> : <MobileWelcome />;
+}
 
 const createStyles = (colors, spacing, radius) => StyleSheet.create({
     loading: {
