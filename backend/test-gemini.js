@@ -24,7 +24,7 @@ async function testGemini() {
         },
         body: JSON.stringify({
           model: "gemini-3.5-flash-lite",
-          input: "Say hello to Portfor U in one short sentence.",
+          input: "Say hello to Portfor-U.",
         }),
         signal: AbortSignal.timeout(20000),
       }

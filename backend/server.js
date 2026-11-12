@@ -26,7 +26,7 @@ app.use(express.json({ limit: "12mb" }));
 // Test Backend
 app.get("/", (req, res) => {
   res.json({
-    message: "Portfor U AI Backend is running!",
+    message: "Portfor-U AI Backend is running!",
     model: GEMINI_MODEL,
   });
 });

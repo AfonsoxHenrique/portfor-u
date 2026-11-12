@@ -18,7 +18,7 @@ async function testResume() {
     const pdfBuffer = fs.readFileSync(pdfPath);
     const fileBase64 = pdfBuffer.toString("base64");
 
-    console.log("Step 2: Sending PDF to Portfor U Backend...");
+    console.log("Step 2: Sending PDF to Portfor-U Backend...");
 
     const response = await fetch(
       "http://localhost:3000/api/analyze-resume",
@@ -31,7 +31,7 @@ async function testResume() {
           fileBase64,
           fileName: "Test_resume_Wendy.pdf",
           mimeType: "application/pdf",
-          targetRole: "Junior Software Developer",
+          targetRole: "Cashier",
         }),
         signal: AbortSignal.timeout(120000),
       }
