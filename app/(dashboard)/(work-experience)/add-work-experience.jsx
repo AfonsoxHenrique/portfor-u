@@ -9,6 +9,7 @@ import {
     addDoc, collection, doc, getDoc, updateDoc, deleteDoc, serverTimestamp,
 } from "firebase/firestore";
 
+import { republishIfVisible } from "../../../services/publicProfile";
 import { auth, db } from "../../../firebase/firebase";
 import { useTheme } from "../../../theme/ThemeContext";
 import ScreenHeader from "../../../components/ScreenHeader";
@@ -97,6 +98,7 @@ const AddWorkExperience = () => {
 
                         try {
                             await deleteDoc(experienceRef(user.uid));
+                            republishIfVisible();
                             router.back();
                         } catch (error) {
                             console.error("Delete error:", error);
@@ -153,7 +155,7 @@ const AddWorkExperience = () => {
                     createdAt: serverTimestamp(),
                 });
             }
-
+            republishIfVisible();
             router.back();
         } catch (error) {
             console.error("Error saving experience:", error);

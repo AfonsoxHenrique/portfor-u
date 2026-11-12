@@ -13,6 +13,7 @@ import { subscribeToProject, deleteProject, setProjectFeatured } from "../../../
 import { formatRange } from "../../../utils/dates";
 import { getCategory } from "../../../theme/projectCategories";
 import { getLinkMeta } from "../../../utils/links";
+import { republishIfVisible } from "../../../services/publicProfile";
 
 export default function ProjectDetails() {
     const router = useRouter();
@@ -46,6 +47,7 @@ export default function ProjectDetails() {
     const toggleFeatured = async () => {
         try {
             await setProjectFeatured(id, !project.featured);
+            republishIfVisible();
         } catch (error) {
             console.error("Feature toggle error:", error);
             Alert.alert("Error", "Could not update this project.");
@@ -62,6 +64,7 @@ export default function ProjectDetails() {
                     try {
                         setDeleting(true);
                         await deleteProject(project);
+                        republishIfVisible();
                         router.back();
                     } catch (error) {
                         console.error("Delete project error:", error);

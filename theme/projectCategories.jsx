@@ -47,7 +47,7 @@ export const PROJECT_CATEGORIES = [
         skillsLabel: "Skills & tools",
         skillsPlaceholder: "e.g. Canva, Meta Ads, Google Analytics",
         titlePlaceholder: "e.g. Donation campaign for a local charity",
-        descriptionPlaceholder: "The goal, your strategy, and the results (numbers help!)",
+        descriptionPlaceholder: "The goal, your strategy, and the results",
     },
     {
         id: "academic",

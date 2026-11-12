@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../../theme/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ScreenHeader";
+import { republishIfVisible } from "../../../services/publicProfile";
 import { useEffect, useState } from "react";
 import { Alert, Linking } from "react-native";
 
@@ -94,7 +95,7 @@ const Certificates = () => {
                             }
 
                             await deleteDoc(certificateRef);
-
+                            republishIfVisible();
                             Alert.alert("Success", "Certificate deleted.");
                         } catch (error) {
                             console.error("Delete certificate error:", error);

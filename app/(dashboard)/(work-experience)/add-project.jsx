@@ -16,6 +16,7 @@ import LinkListInput from "../../../components/LinkListInput";
 import { addProject, getProject, updateProject } from "../../../services/projects";
 import { PROJECT_CATEGORIES, getCategory } from "../../../theme/projectCategories";
 import { normalizeUrl } from "../../../utils/links";
+import { republishIfVisible } from "../../../services/publicProfile";
 
 const MAX_IMAGES = 5;
 const SUMMARY_MAX = 120;
@@ -171,6 +172,7 @@ export default function AddProject() {
             } else {
                 await addProject(data, newImageUris);
             }
+            republishIfVisible();
             router.back();
         } catch (error) {
             console.error("Save project error:", error);

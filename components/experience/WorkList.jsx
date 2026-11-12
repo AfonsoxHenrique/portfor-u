@@ -7,6 +7,7 @@ import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import { useTheme } from "../../theme/ThemeContext";
 import { useAuthUser } from "../../hooks/useAuthUser";
+import { republishIfVisible } from "../../services/publicProfile";
 import ExperienceCard from "../ExperienceCard";
 
 export default function WorkList({ onCountChange }) {
@@ -85,6 +86,7 @@ export default function WorkList({ onCountChange }) {
                         }
                         try {
                             await deleteDoc(doc(db, "users", user.uid, "workExperience", id));
+                            republishIfVisible();
                         } catch (error) {
                             console.error("Error deleting experience:", error);
                             Alert.alert("Error", "Could not delete this experience.");

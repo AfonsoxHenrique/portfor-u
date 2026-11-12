@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../../theme/ThemeContext";
 
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import SectionGroup from "../../../components/SectionGroup";
 import SettingsRow from "../../../components/SettingsRow";
 import SettingsSwitchRow from "../../../components/SettingsSwitchRow";
@@ -130,7 +130,7 @@ const Profile = () => {
                             icon="eye-outline"
                             title="Portfolio Visibility"
                             subtitle="Public sharing is on"
-                            onPress={() => router.push('/portfolio-visibility')}
+                            onPress={() => router.push('/public-profile')}
                         />
                     </SectionGroup>
 
