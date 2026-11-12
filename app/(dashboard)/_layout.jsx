@@ -1,16 +1,40 @@
-import { Tabs } from "expo-router"
-import { useColorScheme } from "react-native"
-
+import { Redirect, Tabs } from "expo-router";
+import { View, ActivityIndicator, Platform } from "react-native";
+import { useAuthUser } from "../../hooks/useAuthUser";
+import {useTheme } from "../../theme/ThemeContext"
 import { Ionicons } from "@expo/vector-icons"
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function DashboardLayout() {
+    const { user, initializing } = useAuthUser()
+    const { colors, isDark } = useTheme()
+    const insets = useSafeAreaInsets()
+
+    if (Platform.OS === "web") return <Redirect href="/" />;
+
+    if (initializing) {
+        return (
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                <ActivityIndicator />
+            </View>
+        )
+    }
+
+    if (!user) return <Redirect href="/" />
+    if (!user.emailVerified) return <Redirect href="/verify-email" />
    
     return(
     <Tabs 
         screenOptions ={{ 
             headerShown: false,
+            tabBarStyle:{
+                backgroundColor: colors.surface,
+                height: 60 + insets.bottom,
+                paddingBottom: insets.bottom,
+                borderTopColor: colors.border,
+            },
             tabBarActiveTintColor: "#3B82F6", 
-            tabBarInactiveTintColor: "#494949",
+            tabBarInactiveTintColor: isDark ? "#FFFFFF" : "#494949",
         }}
     >
 
@@ -48,6 +72,21 @@ export default function DashboardLayout() {
                     name={focused ? 'briefcase' : 'briefcase-outline'}
                 />
             )}}
+        />
+
+        {/* For Education */}
+        <Tabs.Screen
+            name="(education)"
+            options={{
+                title: "Education",
+                tabBarIcon: ({ focused, color }) => (
+                    <Ionicons
+                        size={24}
+                        color={color}
+                        name={focused ? "school" : "school-outline"}
+                    />
+                )
+            }}
         />
 
         {/* For Certificates */}

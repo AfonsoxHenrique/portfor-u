@@ -4,8 +4,18 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../../theme/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ScreenHeader";
+import { republishIfVisible } from "../../../services/publicProfile";
+import { useEffect, useState } from "react";
+import { Alert, Linking } from "react-native";
 
-// Replace with real data from Firebase
+import { httpsCallable } from "firebase/functions";
+import { updateDoc, serverTimestamp } from "firebase/firestore";
+import { functions } from "../../../firebase/firebase";
+
+import { auth, db, storage } from "../../../firebase/firebase";
+import { collection, onSnapshot, doc, deleteDoc, } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
+
 const MOCK_CERTIFICATES = [
     {
         id: '1',
@@ -31,20 +41,234 @@ const MOCK_CERTIFICATES = [
 ]
 
 const Certificates = () => {
-    const router = useRouter()
-    const { colors, spacing, radius } = useTheme()
-    const styles = createStyles(colors, spacing, radius)
+    const router = useRouter();
+    const { colors, spacing, radius } = useTheme();
+    const styles = createStyles(colors, spacing, radius);
+    const [certificates, setCertificates] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const handleAdd = () => {
-        router.push('/add-certificate')
-    }
+        router.push("/add-certificate");
+    };
+    
+    const handleDelete = (certificateId) => {
+        Alert.alert(
+            "Delete Certificate",
+            "Are you sure you want to delete this certificate?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const user = auth.currentUser;
 
-    const handleCertPress = (id) => {
-        console.log('View cert', id)
-    }
-    const handleDelete = (id) => {      
-        console.log('Delete cert', id)
-    }
+                            if (!user) return;
+
+                            const certificateRef = doc(
+                                db,
+                                "users",
+                                user.uid,
+                                "certificates",
+                                certificateId
+                            );
+
+                            const certificate = certificates.find(
+                                (item) => item.id === certificateId
+                            );
+
+                            if (certificate?.storagePath) {
+                                try {
+                                    await deleteObject(
+                                        ref(storage, certificate.storagePath)
+                                    );
+                                } catch (storageError) {
+                                    console.log(
+                                        "Storage file could not be deleted:",
+                                        storageError
+                                    );
+                                }
+                            }
+
+                            await deleteDoc(certificateRef);
+                            republishIfVisible();
+                            Alert.alert("Success", "Certificate deleted.");
+                        } catch (error) {
+                            console.error("Delete certificate error:", error);
+                            Alert.alert("Error", "Could not delete certificate.");
+                        }
+                    },
+                },
+            ]
+        );
+    };  
+
+    const handleCertPress = async (certificateId) => {
+
+        const certificate = certificates.find(
+            (item) => item.id === certificateId
+        );
+
+        if (!certificate) return;
+
+        if (certificate.downloadURL) {
+            try {
+                await Linking.openURL(certificate.downloadURL);
+            } catch (error) {
+                console.error("Open certificate error:", error);
+                Alert.alert("Error", "Could not open this certificate.");
+            }
+        } else if (certificate.credentialId) {
+            Alert.alert(
+                "Credential Information",
+                certificate.credentialId
+            );
+        } else {
+            Alert.alert(
+                "No File Available",
+                "This certificate does not have an uploaded file."
+            );
+        }
+    };
+
+    useEffect(() => {
+        const user = auth.currentUser;
+
+        if (!user) {
+            setCertificates([]);
+            setLoading(false);
+            return;
+        }
+
+        const certificatesRef = collection(
+            db,
+            "users",
+            user.uid,
+            "certificates"
+        );
+
+        const unsubscribe = onSnapshot(
+            certificatesRef,
+            (snapshot) => {
+                const certificateList = snapshot.docs.map((document) => ({
+                    id: document.id,
+                    ...document.data(),
+                }));
+
+                setCertificates(certificateList);
+                setLoading(false);
+            },
+            (error) => {
+                console.error("Error loading certificates:", error);
+                setLoading(false);
+            }
+        );
+
+        return unsubscribe;
+    }, []);
+
+    const getVerificationStatus = (status) => {
+        switch (status) {
+            case "issuer_confirmed":
+                return {
+                    label: "Issuer confirmed",
+                    color: "#16A34A",
+                    icon: "checkmark-circle",
+                };
+            case "revoked":
+                return {
+                    label: "Revoked",
+                    color: colors.red,
+                    icon: "close-circle",
+                };
+            case "verified":
+                return {
+                    label: "Verified",
+                    color: "#16A34A",
+                    icon: "checkmark-circle",
+                };
+
+            case "unconfirmed":
+                return {
+                    label: "Unconfirmed",
+                    color: colors.amber,
+                    icon: "alert-circle",
+                };
+
+            case "unsupported":
+                return {
+                    label: "Unsupported",
+                    color: colors.textMuted,
+                    icon: "help-circle",
+                };
+
+            case "not_provided":
+            default:
+                return {
+                    label: "Not provided",
+                    color: colors.textMuted,
+                    icon: "remove-circle",
+                };
+        }
+    };
+
+    const getOwnershipStatus = (status) => {
+        switch (status) {
+            case "confirmed":
+                return {
+                    label: "Ownership confirmed",
+                    color: "#16A34A",
+                    icon: "checkmark-circle",
+                };
+
+            case "unconfirmed":
+            default:
+                return {
+                    label: "Ownership unconfirmed",
+                    color: colors.amber,
+                    icon: "alert-circle",
+                };
+        }
+    };
+
+    const handleRecheck = async (cert) => {
+        if (!cert.verificationURL) {
+            Alert.alert("No verification link", "This certificate doesn't have a verification URL.");
+            return;
+        }
+
+        try {
+            const checkURL = httpsCallable(functions, "checkCertificateURL");
+
+            const result = await checkURL({
+                verificationURL: cert.verificationURL || "",
+                credentialId: cert.credentialId || "",
+                issuer: cert.issuer || "",
+            });
+
+            await updateDoc(
+                doc(db, "users", auth.currentUser.uid, "certificates", cert.id),
+                {
+                    verificationStatus: result.data.verificationStatus,
+                    ownershipStatus: result.data.ownershipStatus || "unconfirmed",
+                    revocationStatus: result.data.revocationStatus || "unknown",
+                    verificationCheckedAt: serverTimestamp(),
+                    verificationMessage: result.data.message || null,
+                    detectedIssuer: result.data.issuer || null,
+                    verificationMethod: result.data.verificationMethod || null,
+                }
+            );
+
+            Alert.alert("Check complete", result.data.message);
+        } catch (error) {
+            console.error("Certificate recheck error:", error);
+            Alert.alert("Error", "Could not check this certificate.");
+        }
+    };
 
     return (
             <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -55,14 +279,14 @@ const Certificates = () => {
                 >
                     <ScreenHeader
                         title="Certificates"
-                        subtitle={`${MOCK_CERTIFICATES.length} EARNED BADGES`}
+                        subtitle={`${certificates.length} EARNED BADGES`}
                         bg={colors.amberTint}
                         subtitleColor={colors.amber}
                     />
 
                     <View style={styles.body}>
-                        <View style={styles.grid}>
-                            {MOCK_CERTIFICATES.map((cert) => (
+                        <View style={styles.grid}> 
+                            {certificates.map((cert) => (
                                 <View key={cert.id} style={styles.certCard}>
                                     <TouchableOpacity
                                         style={styles.deleteIconBtn}
@@ -72,14 +296,76 @@ const Certificates = () => {
                                         <Ionicons name="trash" size={14} color={colors.red} />
                                     </TouchableOpacity>
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => handleCertPress(cert.id)}>
-                                        <Image
-                                            source={cert.logo}
-                                            style={styles.logoImage}
-                                            resizeMode="contain"
-                                        />
+                                        <View style={styles.logoImage}>
+                                            <Ionicons
+                                                name="ribbon-outline"
+                                                size={28}
+                                                color={colors.amber}
+                                            />
+                                        </View>
                                         <Text style={styles.certName}>{cert.name}</Text>
                                         <Text style={styles.certIssuer}>{cert.issuer}</Text>
                                         <Text style={styles.certDate}>{cert.earnedDate}</Text>
+                                        {(() => {
+                                            const status = getVerificationStatus(
+                                                cert.verificationStatus
+                                            );
+
+                                            const ownership = getOwnershipStatus(
+                                                cert.ownershipStatus
+                                            );
+
+                                            return (
+                                                <>
+                                                    <View style={styles.verificationStatus}>
+                                                        <Ionicons
+                                                            name={status.icon}
+                                                            size={13}
+                                                            color={status.color}
+                                                        />
+                                                        <Text
+                                                            style={[
+                                                                styles.verificationText,
+                                                                { color: status.color },
+                                                            ]}
+                                                        >
+                                                            Issuer: {status.label}
+                                                        </Text>
+                                                    </View>
+
+                                                    <View style={styles.verificationStatus}>
+                                                        <Ionicons
+                                                            name={ownership.icon}
+                                                            size={13}
+                                                            color={ownership.color}
+                                                        />
+                                                        <Text
+                                                            style={[
+                                                                styles.verificationText,
+                                                                { color: ownership.color },
+                                                            ]}
+                                                        >
+                                                            {ownership.label}
+                                                        </Text>
+                                                    </View>
+                                                </>
+                                            );
+                                        })()}
+                                        {(cert.verificationURL || cert.credentialId) && (
+                                        <TouchableOpacity
+                                            style={styles.recheckButton}
+                                            onPress={() => handleRecheck(cert)}
+                                        >
+                                            <Ionicons
+                                                name="refresh"
+                                                size={13}
+                                                color={colors.primary}
+                                            />
+                                            <Text style={styles.recheckButtonText}>
+                                                Recheck
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -232,7 +518,17 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         color: 'rgba(255,255,255,0.75)',
         lineHeight: 18,
     },
-    
+    verificationStatus: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        marginTop: spacing.sm,
+    },
+
+    verificationText: {
+        fontSize: 11,
+        fontWeight: "600",
+    },
     deleteIconBtn: {
         position: 'absolute',
         top: spacing.sm,
@@ -244,6 +540,18 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1,
+    },
+    recheckButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 5,
+        marginTop: spacing.sm,
+    },
+
+    recheckButtonText: {
+        fontSize: 11,
+        fontWeight: "600",
+        color: colors.primary,
     },
 })
 
