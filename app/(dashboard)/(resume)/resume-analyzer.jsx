@@ -241,7 +241,7 @@ const ResumeAnalyzer = () => {
 
                         <TextInput
                             style={styles.input}
-                            placeholder="e.g. Junior Software Developer"
+                            placeholder="e.g. Software Developer"
                             placeholderTextColor={colors.textMuted}
                             value={targetRole}
                             onChangeText={setTargetRole}

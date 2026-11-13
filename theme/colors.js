@@ -14,14 +14,14 @@ export const colors = {
         textPrimary: '#F3F6FC',
         textSecondary: '#B6C3D6',
         textMuted: '#94A6BF',
-        segmentedText: '#0F172A',
+        segmentedText: '#afb2ba',
     
         // Accents & controls
         navy: '#3B82F6',
         accentBlue: '#6AA5FF',   
         switchThumb: '#FFFFFF',
         white: '#FFFFFF',       
-        success: '#35D6A1',      
+        success: '#35D6A1',     
         amber: '#E9BD55',        
         red: '#FF646D',          
         purple: '#B98CFF',
