@@ -9,6 +9,8 @@ import { auth, db } from "../../firebase/firebase";
 import { useTheme } from "../../theme/ThemeContext"
 import ProgressBar from "../../components/ProgressBar";
 import CredentialCard from "../../components/CredentialCard";
+import { useUserProfile } from "../../hooks/useUserProfile";
+import ProfileAvatar from "../../components/home/ProfileAvatar";
 
 
 
@@ -16,6 +18,7 @@ const Home = () => {
     const router = useRouter()
     const { colors, spacing, radius } = useTheme()
     const styles = createStyles(colors, spacing, radius)
+    const { firstName, photoURL, profile } = useUserProfile();
 
     const [userProfile, setUserProfile] = useState(null);
     const [resumeList, setResumeList] = useState([]);
@@ -154,9 +157,17 @@ const Home = () => {
                     <View style={styles.circleLarge} />
                     <View style={styles.circleSmall} />
                     <Text style={styles.dashboardLabel}>DASHBOARD</Text>
-                    <Text style={styles.greeting}>
-                        Hi, {userProfile?.firstName || auth.currentUser?.displayName?.split(" ")[0] || "there"}
-                    </Text>
+                     <View style={styles.greetingRow}>
+                        <ProfileAvatar
+                            photoURL={photoURL}
+                            name={profile?.fullName || firstName}
+                            onPress={() => router.push("/profile")}
+                            badgeBorderColor={colors.homeHeader}
+                        />
+                        <Text style={styles.greeting} numberOfLines={1}>
+                            Hi, {userProfile?.firstName || auth.currentUser?.displayName?.split(" ")[0]}
+                        </Text>
+                    </View>
                 </View>
 
                 <View style={styles.completionCard}>
@@ -285,11 +296,17 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         color: 'rgba(255,255,255,0.7)',
         letterSpacing: 1,
     },
+    greetingRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.md,
+        marginTop: spacing.sm,
+    },
     greeting: {
+        flexShrink: 1,
         fontSize: 24,
         fontWeight: '800',
         color: colors.white,
-        marginTop: spacing.xs,
     },
     completionCard: {
         backgroundColor: colors.surface,

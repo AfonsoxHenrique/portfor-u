@@ -6,13 +6,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
+import { useTheme } from "../../theme/ThemeContext";
+import ScreenHeader from "../../components/ScreenHeader";
 import {
     getPublicSettings, savePublicSettings, claimUsername, isUsernameAvailable,
     publishProfile, unpublishProfile, normalizeUsername, validateUsername,
     getPublicProfileUrl, USERNAME_RULES,
-} from "../../../services/publicProfile";
+} from "../../services/publicProfile";
 import { useRouter } from "expo-router";
 
 
@@ -189,7 +189,7 @@ export default function PublicProfileSettings() {
         : colors.textMuted;
 
     return (
-        <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
             <ScreenHeader
                 title="Public Profile"
                 subtitle="CONTROL WHAT OTHERS SEE"

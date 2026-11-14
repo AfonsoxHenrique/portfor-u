@@ -54,11 +54,6 @@ export default function WebLanding() {
                         Portfor-U is a mobile app that helps students and jobseekers organise their work and share it
                         with employers through one simple link.
                     </Text>
-
-                    <View style={styles.comingSoon}>
-                        <Ionicons name="phone-portrait-outline" size={16} color={colors.accentBlue} />
-                        <Text style={styles.comingSoonText}>Coming soon to iOS and Android</Text>
-                    </View>
                 </View>
 
                 {/* Find a portfolio */}
@@ -129,17 +124,7 @@ const createStyles = (colors, spacing, radius) => StyleSheet.create({
         textAlign: "center",
         marginTop: spacing.md,
     },
-    comingSoon: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-        backgroundColor: colors.lightBlueTint,
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        borderRadius: radius.pill,
-        marginTop: spacing.lg,
-    },
-    comingSoonText: { fontSize: 13, fontWeight: "700", color: colors.accentBlue },
+
     findCard: {
         width: "100%",
         maxWidth: 560,

@@ -100,24 +100,6 @@ export default function DashboardLayout() {
                 />
             )}}
         />
-
-        {/* For Profile */}
-        <Tabs.Screen
-            name="(profile)"
-            options={{title: "Profile", tabBarIcon: ({ focused, color }) => (
-                <Ionicons
-                    size={24}
-                    color={color}
-                    name={focused ? 'person' : 'person-outline'}
-                />
-            )}}
-        />
-
-        {/* Hiding Guideline Page */}
-        <Tabs.Screen
-            name="guideline"
-            options={{ href: null }}
-        />
     </Tabs>
     )
     

@@ -23,6 +23,7 @@ const AppShell = () => {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(dashboard)" />
+        <Stack.Screen name="(profile)" />
       </Stack>
     </>
   );

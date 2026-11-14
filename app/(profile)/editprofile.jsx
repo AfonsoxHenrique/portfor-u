@@ -10,12 +10,12 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { updateProfile, verifyBeforeUpdateEmail } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
 
-import { auth, db } from "../../../firebase/firebase";
-import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
-import { uploadFile, deleteFile } from "../../../services/storage";
-import { republishIfVisible } from "../../../services/publicProfile";
-import { normalizeUrl } from "../../../utils/links";
+import { auth, db } from "../../firebase/firebase";
+import { useTheme } from "../../theme/ThemeContext";
+import ScreenHeader from "../../components/ScreenHeader";
+import { uploadFile, deleteFile } from "../../services/storage";
+import { republishIfVisible } from "../../services/publicProfile";
+import { normalizeUrl } from "../../utils/links";
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const HEADLINE_MAX = 80;
@@ -142,7 +142,7 @@ const EditProfile = () => {
         setSaving(true);
 
         try {
-            // 1. New photo: upload with a unique name so the old one isn't cached
+            //New photo: upload with a unique name so the old one isn't cached
             let newPhotoURL = profilePhoto;
             let newPhotoPath = photoPath;
 
@@ -156,10 +156,10 @@ const EditProfile = () => {
                 newPhotoPath = uploaded.path;
             }
 
-            // 2. Auth profile (name + photo)
+            //Auth profile (name + photo)
             await updateProfile(user, { displayName: trimmedName, photoURL: newPhotoURL });
 
-            // 3. Firestore profile. Email stays as-is until the new one is verified
+            //Firestore profile. Email stays as-is until the new one is verified
             await setDoc(
                 doc(db, "users", user.uid),
                 {
@@ -179,7 +179,7 @@ const EditProfile = () => {
                 { merge: true }
             );
 
-            // 4. Remove the old photo now that the new one is saved
+            //Remove the old photo now that the new one is saved
             if (selectedImage && photoPath && photoPath !== newPhotoPath) {
                 deleteFile(photoPath).catch(() => {});
             }
@@ -188,7 +188,7 @@ const EditProfile = () => {
             setPhotoPath(newPhotoPath);
             setSelectedImage(null);
 
-            // 5. Email change: send a verification link to the new address
+            //Email change: send a verification link to the new address
             if (emailChanged) {
                 await verifyBeforeUpdateEmail(user, trimmedEmail);
                 Alert.alert(
@@ -243,7 +243,7 @@ const EditProfile = () => {
     const avatarUri = selectedImage?.uri || profilePhoto;
 
     return (
-        <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
             {header}
 
             <KeyboardAvoidingView

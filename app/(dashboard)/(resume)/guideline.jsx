@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../theme/ThemeContext";
-import ScreenHeader from "../../components/ScreenHeader";
+import { useTheme } from "../../../theme/ThemeContext";
+import ScreenHeader from "../../../components/ScreenHeader";
 
 const sections = [
      {

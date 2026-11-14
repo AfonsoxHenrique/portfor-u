@@ -1,15 +1,22 @@
+import { useMemo } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
+import { useTheme } from "../theme/ThemeContext";
 
-const TipCard = ({ icon = 'sparkles', title, body, bg = colors.purpleTint, accentColor = colors.purple, onPress }) => {
+const TipCard = ({ icon = 'sparkles', title, body, bg, accentColor, onPress }) => {
+    const { colors, spacing, radius } = useTheme()
+    const styles = useMemo(() => createStyles(colors, spacing, radius), [colors, spacing, radius])
+
+    const cardBg = bg ?? colors.purpleTint
+    const accent = accentColor ?? colors.purple
+
     return (
-        <TouchableOpacity style={[styles.card, { backgroundColor: bg }]} activeOpacity={0.8} onPress={onPress}>
+        <TouchableOpacity style={[styles.card, { backgroundColor: cardBg }]} activeOpacity={0.8} onPress={onPress}>
             <View style={[styles.iconChip, { backgroundColor: colors.background }]}>
-                <Ionicons name={icon} size={18} color={accentColor} />
+                <Ionicons name={icon} size={18} color={accent} />
             </View>
             <View style={styles.textBlock}>
-                <Text style={[styles.title, { color: accentColor }]}>{title}</Text>
+                <Text style={[styles.title, { color: accent }]}>{title}</Text>
                 <Text style={styles.body}>{body}</Text>
             </View>
         </TouchableOpacity>
@@ -18,7 +25,7 @@ const TipCard = ({ icon = 'sparkles', title, body, bg = colors.purpleTint, accen
 
 export default TipCard
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'flex-start',

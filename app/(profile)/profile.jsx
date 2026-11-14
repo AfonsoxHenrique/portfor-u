@@ -1,17 +1,18 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import SectionGroup from "../../../components/SectionGroup";
-import SettingsRow from "../../../components/SettingsRow";
-import SettingsSwitchRow from "../../../components/SettingsSwitchRow";
+import SectionGroup from "../../components/SectionGroup";
+import SettingsRow from "../../components/SettingsRow";
+import SettingsSwitchRow from "../../components/SettingsSwitchRow";
+import ScreenHeader from "../../components/ScreenHeader";
 
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 
 const Profile = () => {
     const router = useRouter()
@@ -70,8 +71,17 @@ const Profile = () => {
     };
 
     return (
-            <SafeAreaView style={styles.safeArea} edges={['top']}>
-                <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+                <ScreenHeader
+                    title="Profile"
+                    bg={colors.lightBlueTint}
+                    subtitleColor={colors.accentBlue}
+                />
+                <ScrollView 
+                    style={styles.scroll} 
+                    contentContainerStyle={styles.content} 
+                    showsVerticalScrollIndicator={false}
+                >
                     <View style={styles.avatarBlock}>
                         <View style={styles.avatar}>
                         {photoURL ? (

@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -13,13 +12,58 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { updatePassword } from "firebase/auth";
-import { auth } from "../../../firebase/firebase";
-import { colors, spacing, radius } from "../../../theme/colors";
+import { auth } from "../../firebase/firebase";
+import { useTheme } from "../../theme/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader   from "../../../components/ScreenHeader"
+import ScreenHeader   from "../../components/ScreenHeader"
+
+ const PasswordField = ({
+        label,
+        value,
+        onChangeText,
+        visible,
+        onToggleVisibility,
+        placeholder = "Enter password",
+        returnKeyType = "next",
+        styles,
+        colors,
+    }) => (
+        <View style={styles.fieldGroup}>
+            <Text style={styles.label}>{label}</Text>
+
+            <View style={styles.passwordInputContainer}>
+                <TextInput
+                    style={styles.passwordInput}
+                    value={value}
+                    onChangeText={onChangeText}
+                    placeholder={placeholder}
+                    placeholderTextColor={colors.textMuted}
+                    secureTextEntry={!visible}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType={returnKeyType}
+                />
+
+                <TouchableOpacity
+                    style={styles.visibilityButton}
+                    onPress={onToggleVisibility}
+                    accessibilityLabel={visible ? "Hide password" : "Show password"}
+                    activeOpacity={0.7}
+                >
+                    <Ionicons
+                        name={visible ? "eye-outline" : "eye-off-outline"}
+                        size={20}
+                        color={colors.textMuted}
+                    />
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
 
 const ChangePassword = () => {
     const router = useRouter();
+    const { colors, spacing, radius } = useTheme();
+    const styles = useMemo(() => createStyles(colors, spacing, radius), [colors, spacing, radius]);
 
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -136,47 +180,6 @@ const ChangePassword = () => {
         }
     };
 
-    const PasswordField = ({
-        label,
-        value,
-        onChangeText,
-        visible,
-        onToggleVisibility,
-        placeholder = "Enter password",
-        returnKeyType = "next",
-    }) => (
-        <View style={styles.fieldGroup}>
-            <Text style={styles.label}>{label}</Text>
-
-            <View style={styles.passwordInputContainer}>
-                <TextInput
-                    style={styles.passwordInput}
-                    value={value}
-                    onChangeText={onChangeText}
-                    placeholder={placeholder}
-                    placeholderTextColor={colors.textMuted}
-                    secureTextEntry={!visible}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    returnKeyType={returnKeyType}
-                />
-
-                <TouchableOpacity
-                    style={styles.visibilityButton}
-                    onPress={onToggleVisibility}
-                    accessibilityLabel={visible ? "Hide password" : "Show password"}
-                    activeOpacity={0.7}
-                >
-                    <Ionicons
-                        name={visible ? "eye-outline" : "eye-off-outline"}
-                        size={20}
-                        color={colors.textMuted}
-                    />
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
-
     return (
         <SafeAreaView style={styles.safeArea} edges={["top"]}>
             <ScrollView
@@ -200,6 +203,8 @@ const ChangePassword = () => {
                         visible={showCurrent}
                         onToggleVisibility={() => setShowCurrent((value) => !value)}
                         placeholder="Enter current password"
+                        styles={styles}
+                        colors={colors}
                     />
 
                     <PasswordField
@@ -209,6 +214,8 @@ const ChangePassword = () => {
                         visible={showNew}
                         onToggleVisibility={() => setShowNew((value) => !value)}
                         placeholder="Enter new password"
+                        styles={styles}
+                        colors={colors}
                     />
 
                     <PasswordField
@@ -219,6 +226,8 @@ const ChangePassword = () => {
                         onToggleVisibility={() => setShowConfirm((value) => !value)}
                         placeholder="Confirm new password"
                         returnKeyType="done"
+                        styles={styles}
+                        colors={colors}
                     />
                 </View>
 
@@ -226,7 +235,7 @@ const ChangePassword = () => {
                     <Ionicons
                         name="shield-checkmark-outline"
                         size={21}
-                        color={colors.custom13}
+                        color={colors.navy}
                     />
 
                     <View style={styles.securityTextContainer}>
@@ -259,7 +268,7 @@ const ChangePassword = () => {
 
 export default ChangePassword;
 
-const styles = StyleSheet.create({
+const createStyles = (colors, spacing, radius) => StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
@@ -282,7 +291,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: radius.md,
-        backgroundColor: colors.white,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
         alignItems: "center",
@@ -301,7 +310,7 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     formCard: {
-        backgroundColor: colors.white,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.lg,
@@ -325,7 +334,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,
-        backgroundColor: colors.white,
+        backgroundColor: colors.background,
     },
     passwordInput: {
         flex: 1,
@@ -354,7 +363,7 @@ const styles = StyleSheet.create({
     securityTitle: {
         fontSize: 13,
         fontWeight: "700",
-        color: colors.custom13,
+        color: colors.textPrimary,
         marginBottom: spacing.xs,
     },
     securityDescription: {
@@ -366,7 +375,7 @@ const styles = StyleSheet.create({
         minHeight: 54,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colors.custom13,
+        backgroundColor: colors.navy,
         borderRadius: radius.md,
         marginHorizontal: spacing.lg,
         marginTop: spacing.md,
