@@ -8,7 +8,7 @@ import { db } from "../../firebase/firebase";
 import { useTheme } from "../../theme/ThemeContext";
 import { useAuthUser } from "../../hooks/useAuthUser";
 import { republishIfVisible } from "../../services/publicProfile";
-import ExperienceCard from "../ExperienceCard";
+import ExperienceCard from "./ExperienceCard";
 
 export default function WorkList({ onCountChange }) {
     const router = useRouter();

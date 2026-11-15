@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTheme } from "../../../theme/ThemeContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../../../components/ScreenHeader";
-import UploadBox from "../../../components/UploadBox";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import UploadBox from "../../../components/form/UploadBox";
 
 import { useEffect } from "react";
 import * as DocumentPicker from "expo-document-picker";

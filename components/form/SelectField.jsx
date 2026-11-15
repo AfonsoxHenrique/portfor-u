@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const SelectField = ({ label, placeholder = 'Select', value, options, onSelect, style }) => {
     const [open, setOpen] = useState(false)

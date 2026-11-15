@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 export default function TagInput({ label, tags, onChange, placeholder = "Type and press enter" }) {
     const { colors, spacing, radius } = useTheme();

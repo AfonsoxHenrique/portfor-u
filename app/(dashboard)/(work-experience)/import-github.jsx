@@ -8,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
 import { fetchGithubRepos } from "../../../services/github";
 import { subscribeToProjects, importProjects } from "../../../services/projects";
 

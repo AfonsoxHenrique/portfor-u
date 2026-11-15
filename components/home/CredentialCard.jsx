@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const CredentialCard = ({ icon, iconColor, iconBg, title, stat, statColor, subtitle, onPress }) => {
     const { colors, spacing, radius } = useTheme()

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const SectionGroup = ({ title, children }) => {
     const { colors, spacing, radius } = useTheme()

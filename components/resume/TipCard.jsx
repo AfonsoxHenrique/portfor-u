@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const TipCard = ({ icon = 'sparkles', title, body, bg, accentColor, onPress }) => {
     const { colors, spacing, radius } = useTheme()

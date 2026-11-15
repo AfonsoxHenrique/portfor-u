@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, Pressable, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const FloatingActionButton = ({
     icon = "add",

@@ -2,8 +2,9 @@
 import { useMemo, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
 import EducationList from "../../../components/education/EducationList";
 
 export default function Education() {

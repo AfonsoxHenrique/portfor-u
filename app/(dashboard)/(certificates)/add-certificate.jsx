@@ -3,19 +3,20 @@ import {
     TouchableOpacity, ScrollView, Alert, ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../../theme/ThemeContext";
-import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
-import ScreenHeader from "../../../components/ScreenHeader";
 
-import { auth, db, storage } from "../../../firebase/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import { httpsCallable } from "firebase/functions";
-import { functions } from "../../../firebase/firebase";
+import { auth, db, storage, functions } from "../../../firebase/firebase";
+
+import { useTheme } from "../../../theme/ThemeContext";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
 
 const AddCertificate = () => {
     const router = useRouter();

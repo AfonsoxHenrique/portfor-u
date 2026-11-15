@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const ProgressBar = ({ percent = 0, color }) => {
     const { colors, spacing, radius } = useTheme()

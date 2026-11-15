@@ -7,8 +7,8 @@ import { doc, collection, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../../firebase/firebase";
 
 import { useTheme } from "../../theme/ThemeContext"
-import ProgressBar from "../../components/ProgressBar";
-import CredentialCard from "../../components/CredentialCard";
+import ProgressBar from "../../components/ui/ProgressBar";
+import CredentialCard from "../../components/home/CredentialCard";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import ProfileAvatar from "../../components/home/ProfileAvatar";
 

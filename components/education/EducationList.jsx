@@ -15,7 +15,7 @@ import { db } from "../../firebase/firebase";
 import { useTheme } from "../../theme/ThemeContext";
 import { useAuthUser } from "../../hooks/useAuthUser";
 import { republishIfVisible } from "../../services/publicProfile";
-import EducationCard from "../EducationCard";
+import EducationCard from "./EducationCard";
 
 export default function EducationList({ onCountChange }) {
     const router = useRouter();

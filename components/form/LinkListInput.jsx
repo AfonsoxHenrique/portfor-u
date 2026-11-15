@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
-import { getLinkMeta } from "../utils/links";
+import { useTheme } from "../../theme/ThemeContext";
+import { getLinkMeta } from "../../utils/links";
 
 export default function LinkListInput({ links, onChange, max = 5 }) {
     const { colors, spacing, radius } = useTheme();

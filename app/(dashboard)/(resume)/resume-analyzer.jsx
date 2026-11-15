@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import { useTheme } from "../../../theme/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../../../components/ScreenHeader";
-import CircularProgress from "../../../components/CircularProgress";
-import ScoreRow from "../../../components/ScoreRow";
-import SuggestionCard from "../../../components/SuggestionCard";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import CircularProgress from "../../../components/ui/CircularProgress";
+import ScoreRow from "../../../components/resume/ScoreRow";
+import SuggestionCard from "../../../components/resume/SuggestionCard";
 
 // Replace with a real analysis result from your resume-scoring API.
 const MOCK_ANALYSIS = {

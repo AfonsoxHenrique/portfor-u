@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
+import { colors, spacing, radius } from "../../theme/colors";
 
 const UploadBox = ({ label, title, hint, onChooseFile, variant = 'stacked' }) => {
     if (variant === 'inline') {

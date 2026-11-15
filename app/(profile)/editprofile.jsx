@@ -12,7 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 
 import { auth, db } from "../../firebase/firebase";
 import { useTheme } from "../../theme/ThemeContext";
-import ScreenHeader from "../../components/ScreenHeader";
+import ScreenHeader from "../../components/ui/ScreenHeader";
 import { uploadFile, deleteFile } from "../../services/storage";
 import { republishIfVisible } from "../../services/publicProfile";
 import { normalizeUrl } from "../../utils/links";

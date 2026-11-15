@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { View, Text, Image, TextInput, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
-import { normalizeUsername } from "../services/publicProfile";
+import { useTheme } from "../../theme/ThemeContext";
+import { normalizeUsername } from "../../services/publicProfile";
 
 const FEATURES = [
     {
@@ -45,7 +45,7 @@ export default function WebLanding() {
                     <Image
                         source={
                     isDark ?
-                    require('../assets/Portfor-3W.png') : require('../assets/Portfor-3.png')}
+                    require('../../assets/Portfor-3W.png') : require('../../assets/Portfor-3.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />

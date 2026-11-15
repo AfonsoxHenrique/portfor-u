@@ -1,20 +1,19 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, Linking } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useTheme } from "../../../theme/ThemeContext";
-import { SafeAreaView } from "react-native-safe-area-context";
-import ScreenHeader from "../../../components/ScreenHeader";
-import { republishIfVisible } from "../../../services/publicProfile";
-import { useEffect, useState } from "react";
-import { Alert, Linking } from "react-native";
 
 import { httpsCallable } from "firebase/functions";
-import { updateDoc, serverTimestamp } from "firebase/firestore";
-import { functions } from "../../../firebase/firebase";
-
-import { auth, db, storage } from "../../../firebase/firebase";
-import { collection, onSnapshot, doc, deleteDoc, } from "firebase/firestore";
+import { updateDoc, serverTimestamp, collection, onSnapshot, doc, deleteDoc} from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
+
+import { auth, db, storage, functions } from "../../../firebase/firebase";
+
+import { useTheme } from "../../../theme/ThemeContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { republishIfVisible } from "../../../services/publicProfile";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
 
 const MOCK_CERTIFICATES = [
     {

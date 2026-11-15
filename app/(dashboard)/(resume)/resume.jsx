@@ -8,9 +8,9 @@ import { onSnapshot, collection, doc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "../../../firebase/firebase";
 
-import ScreenHeader from "../../../components/ScreenHeader";
-import TipCard from "../../../components/TipCard";
-import FloatingActionButton from "../../../components/FloatingActionButton";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import TipCard from "../../../components/resume/TipCard";
+import FloatingActionButton from "../../../components/ui/FloatingActionButton";
 import { useTheme } from "../../../theme/ThemeContext";
 
 

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 export default function SegmentedToggle({ options, value, onChange, activeColor }) {
     const { colors, spacing, radius } = useTheme();

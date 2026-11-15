@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { colors, spacing, radius } from "../theme/colors";
+import { colors, spacing, radius } from "../../theme/colors";
 
 const StatCard = ({ value, label }) => {
     return (

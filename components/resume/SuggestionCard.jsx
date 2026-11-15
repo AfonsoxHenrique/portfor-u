@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing, radius } from "../theme/colors";
+import { colors, spacing, radius } from "../../theme/colors";
 
 const SuggestionCard = ({ title, description }) => {
     return (

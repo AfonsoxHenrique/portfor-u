@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../theme/ThemeContext";
 import { useAuthUser } from "../hooks/useAuthUser";
 
-import WebLanding from "../components/WebLanding";
+import WebLanding from "../components/public/WebLanding";
 
 const MobileWelcome = () => {
     const router = useRouter()

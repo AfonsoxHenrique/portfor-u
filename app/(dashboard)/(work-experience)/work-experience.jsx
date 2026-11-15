@@ -3,8 +3,8 @@ import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
-import SegmentedToggle from "../../../components/SegmentedToggle";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import SegmentedToggle from "../../../components/ui/SegmentedToggle";
 import WorkList from "../../../components/experience/WorkList";
 import ProjectsList from "../../../components/experience/ProjectsList";
 

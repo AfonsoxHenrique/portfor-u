@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-import { colors, spacing } from "../theme/colors";
-import ProgressBar from "./ProgressBar";
+import { colors, spacing } from "../../theme/colors";
+import ProgressBar from "../ui/ProgressBar";
 
 const ScoreRow = ({ label, percent, color = colors.navy }) => {
     return (

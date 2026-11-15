@@ -9,10 +9,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 
 import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
-import MonthYearField from "../../../components/MonthYearField";
-import TagInput from "../../../components/TagInput";
-import LinkListInput from "../../../components/LinkListInput";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import MonthYearField from "../../../components/form/MonthYearField";
+import TagInput from "../../../components/form/TagInput";
+import LinkListInput from "../../../components/form/LinkListInput";
 import { addProject, getProject, updateProject } from "../../../services/projects";
 import { PROJECT_CATEGORIES, getCategory } from "../../../theme/projectCategories";
 import { normalizeUrl } from "../../../utils/links";

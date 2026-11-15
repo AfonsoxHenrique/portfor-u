@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
 const ExperienceCard = ({ title, company, dateRange, location, description, onEdit, onDelete }) => {
     const { colors, spacing, radius } = useTheme()

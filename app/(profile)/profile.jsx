@@ -4,10 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme/ThemeContext";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import SectionGroup from "../../components/SectionGroup";
-import SettingsRow from "../../components/SettingsRow";
-import SettingsSwitchRow from "../../components/SettingsSwitchRow";
-import ScreenHeader from "../../components/ScreenHeader";
+import SectionGroup from "../../components/settings/SectionGroup";
+import SettingsRow from "../../components/settings/SettingsRow";
+import SettingsSwitchRow from "../../components/settings/SettingsSwitchRow";
+import ScreenHeader from "../../components/ui/ScreenHeader";
 
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";

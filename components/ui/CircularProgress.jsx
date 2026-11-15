@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
-import { colors } from "../theme/colors";
+import { colors } from "../../theme/colors";
 
 const CircularProgress = ({ percent = 0, size = 170, strokeWidth = 14, color = colors.purple, label }) => {
     const radius = (size - strokeWidth) / 2

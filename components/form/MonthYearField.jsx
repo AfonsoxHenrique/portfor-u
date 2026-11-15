@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
-import { MONTHS, formatMonth } from "../utils/dates";
+import { useTheme } from "../../theme/ThemeContext";
+import { MONTHS, formatMonth } from "../../utils/dates";
 
 const parse = (ym) => (ym ? { y: Number(ym.slice(0, 4)), m: Number(ym.slice(5, 7)) } : null);
 

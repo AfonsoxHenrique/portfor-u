@@ -1,30 +1,30 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Switch } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../../theme/ThemeContext";
 
-const SettingsRow = ({ icon, title, subtitle, onPress, danger = false, showDivider = false }) => {
+const SettingsSwitchRow = ({ icon, title, subtitle, value, onValueChange, showDivider = false }) => {
     const { colors, spacing } = useTheme()
     const styles = createStyles(colors, spacing)
-    const iconColor = danger ? colors.red : colors.navy
-    const titleColor = danger ? colors.red : colors.textPrimary
 
     return (
-        <TouchableOpacity
-            style={[styles.row, showDivider && styles.divider]}
-            activeOpacity={0.7}
-            onPress={onPress}
-        >
-            <Ionicons name={icon} size={20} color={iconColor} style={styles.icon} />
+        <View style={[styles.row, showDivider && styles.divider]}>
+            <Ionicons name={icon} size={20} color={colors.navy} style={styles.icon} />
             <View style={styles.textBlock}>
-                <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+                <Text style={styles.title}>{title}</Text>
                 {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-        </TouchableOpacity>
+            <Switch
+                value={value}
+                onValueChange={onValueChange}
+                trackColor={{ false: colors.border, true: colors.navy }}
+                thumbColor={colors.switchThumb}
+                ios_backgroundColor={colors.border}
+            />
+        </View>
     )
 }
 
-export default SettingsRow
+export default SettingsSwitchRow
 
 const createStyles = (colors, spacing) => StyleSheet.create({
     row: {
@@ -47,6 +47,7 @@ const createStyles = (colors, spacing) => StyleSheet.create({
     title: {
         fontSize: 14.5,
         fontWeight: '700',
+        color: colors.textPrimary,
     },
     subtitle: {
         fontSize: 12.5,

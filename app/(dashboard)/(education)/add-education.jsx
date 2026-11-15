@@ -6,16 +6,15 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-    addDoc, collection, doc, getDoc, updateDoc, serverTimestamp,
-} from "firebase/firestore";
+
+import { addDoc, collection, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../../../firebase/firebase";
 
 import { republishIfVisible } from "../../../services/publicProfile";
-import { auth, db } from "../../../firebase/firebase";
 import { useTheme } from "../../../theme/ThemeContext";
-import ScreenHeader from "../../../components/ScreenHeader";
-import MonthYearField from "../../../components/MonthYearField";
-import CheckboxRow from "../../../components/CheckboxRow";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import MonthYearField from "../../../components/form/MonthYearField";
+import CheckboxRow from "../../../components/form/CheckboxRow";
 
 const AddEducation = () => {
     const router = useRouter();
