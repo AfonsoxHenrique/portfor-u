@@ -4,11 +4,33 @@ import { useAuthUser } from "../../hooks/useAuthUser";
 import {useTheme } from "../../theme/ThemeContext"
 import { Ionicons } from "@expo/vector-icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 export default function DashboardLayout() {
     const { user, initializing } = useAuthUser()
     const { colors, isDark } = useTheme()
     const insets = useSafeAreaInsets()
+
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        if (!user?.uid) {
+            setUserRole(null);
+            return;
+        }
+
+        const userRef = doc(db, "users", user.uid);
+
+        const unsubscribe = onSnapshot(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+                setUserRole(snapshot.data().role || "user");
+            }
+        });
+
+        return unsubscribe;
+    }, [user?.uid]);
 
     if (Platform.OS === "web") return <Redirect href="/" />;
 
@@ -100,6 +122,23 @@ export default function DashboardLayout() {
                 />
             )}}
         />
+        
+        {/* Admin Dashboard */}
+        {userRole === "admin" && (
+            <Tabs.Screen
+                name="(admin)"
+                options={{
+                    title: "Admin",
+                    tabBarIcon: ({ focused, color }) => (
+                        <Ionicons
+                            size={24}
+                            color={color}
+                            name={focused ? "shield-checkmark" : "shield-checkmark-outline"}
+                        />
+                    ),
+                }}
+            />
+        )}
     </Tabs>
     )
     
